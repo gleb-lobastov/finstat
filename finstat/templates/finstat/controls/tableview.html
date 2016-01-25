@@ -1,0 +1,21 @@
+{% extends "base_finstat.html" %}
+
+{% block content %}
+{% if table_data %}
+   <table> <!-- дата сумма счет1 счет2 категория//сплит -->
+   {% for row in table_data %}
+      <tr>
+         {% for cell in row %}
+         <td>
+            <div class="finstat-tableview__cell">
+               <span class="finstat-tableview__cell-placeholder"> {{ cell.value }} </span>
+            </div>
+         </td>
+         {% endfor %}
+      </tr>
+   {% endfor %}
+   </table>
+{% else %}
+   <p> empty table </p>
+{% endif %}
+{% endblock %}

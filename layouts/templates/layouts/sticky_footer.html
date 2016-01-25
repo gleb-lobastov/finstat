@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block styles %}
+   {{ block.super }}
+   <link rel="stylesheet" href="{% static 'layouts/sticky_footer.css' %}">
+{% endblock %}
+
+{% block layout %}
+   <div id="layout__wrapper">
+      <div id="layout__header">
+         <div id="layout__header-content">
+
+            {% block header %}
+            {% endblock %}
+
+         </div>
+      </div>
+      <div id="layout__content">
+         <div id="layout__sidebar">
+
+            {% block sidebar_1 %}
+            {% endblock %}
+
+         </div>
+         <div id="layout__main">
+
+            {% block content %}
+            {% endblock %}
+
+         </div>
+      </div>
+      <div class="layout__push"></div>
+   </div>
+   <div id="layout__footer">
+      <div id="layout__footer-content">
+
+         {% block footer %}
+         {% endblock %}
+
+      </div>
+   </div>
+
+{% endblock %}

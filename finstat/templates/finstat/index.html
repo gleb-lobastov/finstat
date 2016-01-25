@@ -1,0 +1,11 @@
+{% extends "finstat/base-finstat.html" %}
+
+{% block jquery_ready %}
+   {{ block.super }}
+   $(document).pjax('a[data-pjax]', '#finstat__bars-container")
+{% endblock %}
+
+{% block content %}
+   <h1> Finstat index </h1>
+   <a href='/page/2' id="finstat__bars-container" data-pjax>more</a>
+{% endblock %}

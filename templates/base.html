@@ -1,0 +1,39 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <link rel="stylesheet" href="{% static 'dist/base.css' %}" />
+   <title>{% block title %}My amazing site{% endblock %}</title>
+   <!-- production dependencies
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css">
+   -->
+   {% block styles %}
+      <link rel="stylesheet" href="{% static 'bower_components/jquery-ui/themes/smoothness/jquery-ui.css' %}">
+      <link rel="stylesheet" href="{% static 'bower_components/jquery-ui/themes/smoothness/jquery-ui.theme.css' %}">
+      <link rel="stylesheet" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.css' %}">
+      <link rel="stylesheet" href="{% static 'bower_components/normalize-css/normalize.css' %}">
+      <link rel="stylesheet" href="{% static 'components/rouble/b-rub_georgia/stylesheet.css' %}">
+   {% endblock %}
+   {% block scripts %}
+      <script src="{% static 'bower_components/jquery/dist/jquery.js' %}"></script>
+      <script src="{% static 'bower_components/jquery-ui/jquery-ui.js' %}"></script>
+      <script src="{% static 'plugins/jquery-ui/widgets/combobox.js' %}"></script>
+      <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.js' %}"></script>
+      <script src="{% static 'bower_components/moment/moment.js' %}"></script>
+      <script>
+      $(function() {
+         {% block jquery_ready %}
+         {% endblock %}
+      });
+      </script>
+   {% endblock %}
+</head>
+
+<body>
+
+{% block layout %}
+{% endblock %}
+
+</body>
+</html>
