@@ -1,8 +1,64 @@
 # -*- coding: UTF-8 -*-
 
 from django.db import models
+from django.db.models.query import QuerySet
+from django.db.models import Case, When, Q, F
+from django.db.models import Count, Sum
 from django.contrib.auth.models import User
 import finstat.modules.currency as currency
+
+
+class TransactionMixin(object):
+    def group_by_period(self, interval):
+        if interval not in ('year', 'month', 'day'):
+            raise ValueError('Период {} не поддерживается'.format(interval))
+        clause = {'period': '''date_trunc('{}', date)'''.format(interval) if interval != 'day' else 'date'}
+
+        return (self
+                .extra(select=clause)
+                .values('period')
+                .annotate(income=Sum(Case(When(~Q(fk_account_from__account_type="OW") &
+                                               Q(fk_account_to__account_type='OW'),
+                                               then='amount'),
+                                          default=0)))
+                .annotate(outcome=Sum(Case(When(~Q(fk_account_to__account_type='OW') &
+                                                Q(fk_account_from__account_type="OW"),
+                                                then='amount'),
+                                           default=0)))
+                .exclude(income=0, outcome=0)
+                .order_by('-period'))
+
+    def every(self):
+        return (self
+                .annotate(period=F('date'))
+                .values('period')
+                .annotate(income=Case(When(~Q(fk_account_from__account_type="OW") &
+                                           Q(fk_account_to__account_type='OW'),
+                                           then='amount'),
+                                      default=0))
+                .annotate(outcome=Case(When(~Q(fk_account_to__account_type='OW') &
+                                            Q(fk_account_from__account_type="OW"),
+                                            then='amount'),
+                                       default=0))
+                .exclude(income=0, outcome=0)
+                .order_by('-period'))
+
+    def limit(self, limit, offset=None):
+        start = max(0, offset)
+        end = (limit + (start if start else 0)) if limit > 0 else None
+        return self[start:end]
+
+    def between(self, min_date, max_date):
+        return self.filter(date__range=(min_date, max_date))
+
+
+class TransactionQuerySet(QuerySet, TransactionMixin):
+    pass
+
+
+class TransactionManager(models.Manager, TransactionMixin):
+    def get_queryset(self):
+        return TransactionQuerySet(self.model, using=self._db)
 
 
 class Performer(models.Model):
@@ -19,6 +75,8 @@ class Performer(models.Model):
 
 
 class Transaction(models.Model):
+    objects = TransactionManager()
+
     # class Meta:
     #     ordering = ["-date"]
 

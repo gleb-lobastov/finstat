@@ -12,25 +12,52 @@ def portion(page=PAGE, page_size=PAGE_SIZE):
     return {'limit': limit, 'offset': offset}
 
 
+def stats(gen):
+    iterator = iter(gen)
+    value = next(gen)
+    max_value = min_value = value
+    for value in gen:
+        min_value = min(value, min_value)
+        max_value = max(value, max_value)
+    return min_value, max_value
+
+
 def _overview(interval=None, page=PAGE, page_size=PAGE_SIZE):
     """ Обзор транзакций сгруппированных по периоду
 
     Args:
         request:
         interval: наименование периода, может быть 'year', 'month', 'day' или None
+        date:
         page:
         page_size:
 
     Returns:
 
+
+        data - x записей
+        min date
+        max date
+        groups
+            days
+            months
+            years
     """
     page, page_size = int(page), int(page_size)
     if interval is None:
-        result = fetch.every(**portion(page, page_size))
+        data = fetch.every(**portion(page, page_size))
     else:
-        result = fetch.by_period(interval, **portion(page, page_size))
+        data = fetch.by_period(interval, **portion(page, page_size))
+
+    min_date, max_date = stats(item['period'] for item in data)
+    intervals = ('year', 'month', 'day')
+    depth = intervals.index(interval) + 1 if interval else len(intervals)
+
+    for level in range(depth):
+        fetch.between(min_date, max_date, intervals[level])
 
     return result
+
 
 def overview(request, interval=None, page=PAGE, page_size=PAGE_SIZE):
     """ Обзор транзакций сгруппированных по периоду
