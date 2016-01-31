@@ -1,3 +1,15 @@
 .finstat__bar {
    border: 1px solid sandybrown;
 }
+
+.finstat__bar div {
+   display: inline-block;
+}
+
+.finstat__bar-period {
+   border: 1px solid peachpuff;
+}
+
+.finstat__bar-content {
+   border: 1px solid darkcyan;
+}
