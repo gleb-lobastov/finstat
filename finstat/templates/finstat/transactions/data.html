@@ -1,5 +1,5 @@
 {% load transactions_extras %}
 
-{% for item in data %}
-   {% bar item %}
+{% for index, item in data %}
+   {% bar index item %}
 {% endfor %}

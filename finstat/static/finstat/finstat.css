@@ -1,3 +1,13 @@
 body {
    font-family: 'Open Sans', sans-serif;
 }
+
+
+/* Интерактивные элементы */
+.finstat-show_on_hover {
+    visibility: hidden;
+}
+
+.finstat-show_on_hover:hover {
+    visibility: visible;
+}

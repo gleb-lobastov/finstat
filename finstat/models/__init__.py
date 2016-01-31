@@ -9,41 +9,34 @@ import finstat.modules.currency as currency
 
 
 class TransactionMixin(object):
-    def group_by_period(self, interval):
-        if interval not in ('year', 'month', 'day'):
-            raise ValueError('Период {} не поддерживается'.format(interval))
-        clause = {'period': '''date_trunc('{}', date)'''.format(interval) if interval != 'day' else 'date'}
+    def fetch(self, interval=None):
+        def none(param):
+            return param
 
-        return (self
-                .extra(select=clause)
+        if interval is not None:
+            if interval not in ('year', 'month', 'day'):
+                raise ValueError('Период {} не поддерживается'.format(interval))
+            clause = {'period': '''date_trunc('{}', date)'''.format(interval) if interval != 'day' else 'date'}
+            queryset = self.extra(select=clause)
+            agg = Sum
+        else:
+            queryset = self.annotate(period=F('date'))
+            agg = none
+
+        return (queryset
                 .values('period')
-                .annotate(income=Sum(Case(When(~Q(fk_account_from__account_type="OW") &
+                .annotate(income=agg(Case(When(~Q(fk_account_from__account_type="OW") &
                                                Q(fk_account_to__account_type='OW'),
                                                then='amount'),
                                           default=0)))
-                .annotate(outcome=Sum(Case(When(~Q(fk_account_to__account_type='OW') &
+                .annotate(outcome=agg(Case(When(~Q(fk_account_to__account_type='OW') &
                                                 Q(fk_account_from__account_type="OW"),
                                                 then='amount'),
                                            default=0)))
                 .exclude(income=0, outcome=0)
                 .order_by('-period'))
 
-    def every(self):
-        return (self
-                .annotate(period=F('date'))
-                .values('period')
-                .annotate(income=Case(When(~Q(fk_account_from__account_type="OW") &
-                                           Q(fk_account_to__account_type='OW'),
-                                           then='amount'),
-                                      default=0))
-                .annotate(outcome=Case(When(~Q(fk_account_to__account_type='OW') &
-                                            Q(fk_account_from__account_type="OW"),
-                                            then='amount'),
-                                       default=0))
-                .exclude(income=0, outcome=0)
-                .order_by('-period'))
-
-    def limit(self, limit, offset=None):
+    def limit(self, limit=None, offset=None):
         start = max(0, offset)
         end = (limit + (start if start else 0)) if limit > 0 else None
         return self[start:end]

@@ -59,6 +59,21 @@ def paging(query_func):
     return wrapper
 
 
+def between(min_date, max_date, interval):
+    return (Transaction.objects
+            .filter(date__range=(min_date, max_date))
+            .annotate(period=F('date'))
+            .values('period')
+            .annotate(income=Case(When(~Q(fk_account_from__account_type="OW") &
+                                       Q(fk_account_to__account_type='OW'),
+                                       then='amount'),
+                                  default=0))
+            .annotate(outcome=Case(When(~Q(fk_account_to__account_type='OW') &
+                                        Q(fk_account_from__account_type="OW"),
+                                        then='amount'),
+                                   default=0))
+            .order_by('-period'))
+
 @paging
 def by_period(interval):
     """ Соотносит период, доход и расход за период.
@@ -110,3 +125,4 @@ def every():
             .exclude(income=0, outcome=0)
             .order_by('-period'))
 
+# fetch.every().paging

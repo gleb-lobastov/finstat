@@ -4,5 +4,5 @@ register = template.Library()
 
 
 @register.inclusion_tag('finstat/controls/bar.html')
-def bar(item):
-    return {'item': item}
+def bar(index, item):
+    return {'index': index, 'item': item}

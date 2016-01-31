@@ -1,5 +1,6 @@
 from finstat.defaults import PAGE, PAGE_SIZE
 from finstat.models import fetch
+from finstat.models import Transaction
 
 from django.template import loader, RequestContext
 from django.http import HttpResponse, Http404
@@ -43,20 +44,14 @@ def _overview(interval=None, page=PAGE, page_size=PAGE_SIZE):
             months
             years
     """
-    page, page_size = int(page), int(page_size)
-    if interval is None:
-        data = fetch.every(**portion(page, page_size))
-    else:
-        data = fetch.by_period(interval, **portion(page, page_size))
+    records = Transaction.objects.fetch(interval)[page_size*page: page_size*(page+1)]
 
-    min_date, max_date = stats(item['period'] for item in data)
-    intervals = ('year', 'month', 'day')
-    depth = intervals.index(interval) + 1 if interval else len(intervals)
+    # min_date, max_date = stats(item['period'] for item in data)
+    # intervals = ('year', 'month', 'day')
+    # depth = intervals.index(interval) + 1 if interval else len(intervals)
+    # data = {intervals[level]: fetch.between(min_date, max_date, intervals[level]) for level in range(depth)}
 
-    for level in range(depth):
-        fetch.between(min_date, max_date, intervals[level])
-
-    return result
+    return records
 
 
 def overview(request, interval=None, page=PAGE, page_size=PAGE_SIZE):
@@ -71,7 +66,9 @@ def overview(request, interval=None, page=PAGE, page_size=PAGE_SIZE):
     Returns:
 
     """
-    data = _overview(interval, page, page_size)
+    page, page_size = max(0, int(page)), max(1, int(page_size))
+
+    data = enumerate(_overview(interval, page, page_size), start=page*page_size + 1)
     template = loader.get_template('finstat/transactions/data.html')
     context = RequestContext(request, {'data': data,
                                        'paging': (page, page_size),
@@ -80,7 +77,7 @@ def overview(request, interval=None, page=PAGE, page_size=PAGE_SIZE):
 
 
 def index(request):
-    data = _overview()
+    data = enumerate(_overview(), start=1)
     template = loader.get_template('finstat/transactions/index.html')
     context = RequestContext(request, {'data': data,
                                        'paging': (PAGE, PAGE_SIZE),

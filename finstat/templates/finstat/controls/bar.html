@@ -1,5 +1,13 @@
 <div class="finstat__bar">
-   <div>
-      {{ item.period }}: + {{ item.income }}, -{{ item.outcome }}
+   <div class="finstat__bar-index">{{ index }}</div>
+   <div class="finstat__bar-period">
+      {% if next in item %}
+      <div>{{ item.period |date:"d"}} </div>
+      <div {% if not item.next.month %} class="finstat-show_on_hover" {% endif %}>{{ item.period |date:"M"}} </div>
+      <div {% if not item.next.month %} class="finstat-show_on_hover" {% endif %}>{{ item.period |date:"Y"}} </div>
+      {% endif %}
+   </div>
+   <div class="finstat__bar-content">
+      + {{ item.income }}, -{{ item.outcome }}
    </div>
 </div>
