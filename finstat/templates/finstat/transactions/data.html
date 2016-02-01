@@ -1,5 +1,22 @@
 {% load transactions_extras %}
 
 {% for index, item in data %}
-   {% bar index item %}
+   <div class="finstat__bar">
+      <div class="finstat__bar-index">{{ index }}</div>
+      <div class="finstat__bar-period finstat-show_on_hover-area">
+         <div {% ifchanged item.period.year %} {% else %} class="finstat-show_on_hover" {% endifchanged %}>
+            {{ item.period |date:"Y"}}
+         </div>
+         <div {% ifchanged item.period.year item.period.month %}
+              {% else %} class="finstat-show_on_hover" {% endifchanged %}>
+            {{ item.period |date:"M"}}
+         </div>
+         <div {% ifchanged item.period %} {% else %} class="finstat-show_on_hover" {% endifchanged %}>
+            {{ item.period |date:"d"}}
+         </div>
+      </div>
+      <div class="finstat__bar-content">
+         + {{ item.income }}, -{{ item.outcome }}
+      </div>
+   </div>
 {% endfor %}

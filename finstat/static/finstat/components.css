@@ -1,13 +1,26 @@
 .finstat__bar {
    border: 1px solid sandybrown;
+   position: relative;
 }
 
 .finstat__bar div {
    display: inline-block;
 }
 
+.finstat__bar-index {
+   bottom: 0;
+   color: gray;
+   font-size: 0.5em;
+   margin-right: 2px;
+   position: absolute;
+   right: 100%;
+}
+
 .finstat__bar-period {
    border: 1px solid peachpuff;
+   margin: 0 2px;
+   text-align: right;
+   width: 7em;
 }
 
 .finstat__bar-content {
