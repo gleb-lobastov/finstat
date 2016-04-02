@@ -5,12 +5,42 @@ body {
 
 
 /* Интерактивные элементы */
-.finstat-show_on_hover,
+.finstat__show-on-hover,
 .finstat-hidden {
     visibility: hidden;
 }
 
-.finstat-show_on_hover-area:hover > .finstat-show_on_hover,
-.finstat-show_on_hover:hover {
+.finstat__show-on-hover_area:hover .finstat__show-on-hover,
+.finstat__show-on-hover:hover {
     visibility: visible;
+}
+
+
+.finstat__icon {
+    background-color: gray;
+    border-radius: 100%;
+}
+
+.finstat__separator {
+    border-right: 1px solid rgb(127, 127, 127);
+    border-right: 1px solid rgba(127, 127, 127, 0.5);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
+.finstat__tall-row.row {
+    position: relative;
+}
+
+.finstat__highlight-row:hover {
+    background-color: lightyellow;
+}
+
+.finstat__tall-row > div{
+    padding-top: 2em;
+    padding-bottom: 0.5em;
+}
+
+.finstat__money {
+    width: 90px;
 }

@@ -51,6 +51,8 @@ def _overview(interval=None, page=PAGE, page_size=PAGE_SIZE):
     # depth = intervals.index(interval) + 1 if interval else len(intervals)
     # data = {intervals[level]: fetch.between(min_date, max_date, intervals[level]) for level in range(depth)}
 
+
+    # index, da
     return records
 
 
@@ -69,7 +71,7 @@ def overview(request, interval=None, page=PAGE, page_size=PAGE_SIZE):
     page, page_size = max(0, int(page)), max(1, int(page_size))
 
     data = enumerate(_overview(interval, page, page_size), start=page*page_size + 1)
-    template = loader.get_template('finstat/transactions/data.html')
+    template = loader.get_template('finstat/transactions/timeline.html')
     context = RequestContext(request, {'data': data,
                                        'paging': (page, page_size),
                                        'arguments': {'interval': interval}})

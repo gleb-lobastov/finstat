@@ -5,6 +5,7 @@
 
 .finstat__bar div {
    display: inline-block;
+   vertical-align: middle;
 }
 
 .finstat__bar-index {
@@ -25,4 +26,23 @@
 
 .finstat__bar-content {
    border: 1px solid darkcyan;
+}
+
+.finstat__bar-income {
+   color: yellowgreen;
+}
+
+.finstat__bar-outcome {
+   color: indianred;
+}
+
+.finstat__bar-income,
+.finstat__bar-outcome {
+   width: 60px;
+   text-align: right;
+}
+
+.finstat__bar-category {
+   width: 300px;
+   padding: 0 5px;
 }

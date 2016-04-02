@@ -22,9 +22,11 @@ class TransactionMixin(object):
         else:
             queryset = self.annotate(period=F('date'))
             agg = none
-
         return (queryset
-                .values('period')
+                .annotate(category=F('fk_category__category_name'))
+                .annotate(account_from=F('fk_account_from__account_name'))
+                .annotate(account_to=F('fk_account_to__account_name'))
+                .values('period', 'category', 'comment', 'account_from', 'account_to')
                 .annotate(income=agg(Case(When(~Q(fk_account_from__account_type="OW") &
                                                Q(fk_account_to__account_type='OW'),
                                                then='amount'),

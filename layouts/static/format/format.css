@@ -1,0 +1,26 @@
+.format__right {
+    text-align: right;
+}
+
+.format__ellipsis {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.format__minor {
+   color: gray;
+   font-size: 0.7em;
+}
+
+.format__inline-block {
+    display: inline-block;
+}
+
+.format__hidden {
+    display: none;
+}
+
+.format__invisible {
+    visibility: hidden;
+}
