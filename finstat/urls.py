@@ -6,10 +6,11 @@ urlpatterns = patterns(
     '',
     # /finstat
     # url(r'^$', views.index, name='finstat-index'),
-    url(r'^transactions$', transactions.index, name='finstat-transactions-index'),
-    url(r'^transactions/page(?P<page>\d+)$', transactions.overview, name='finstat-transactions-overview'),
-    url(r'^transactions/(?P<interval>((year)|(month)|(day)))/page(?P<page>\d+)$',
-        transactions.overview, name='finstat-transactions-overview'),
+    url(r'^transactions$', transactions.transactions_list_view, {'page': 1}, name='finstat-transactions-index'),
+    url(r'^transactions/add$', transactions.post_add),
+    url(r'^transactions/page(?P<page>\d+)$', transactions.transactions_list_view, name='finstat-list_view'),
+    url(r'^transactions/(?P<interval>((daily)|(monthly)|(annual)))/page(?P<page>\d+)$',
+        transactions.transactions_stats_view, name='finstat-transactions-overview'),
     # transactions/year2015/month10/day1
     # 2015 +1000000 - 999999
     # 2015.10 +100000 -99999

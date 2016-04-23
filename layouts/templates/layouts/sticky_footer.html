@@ -27,7 +27,9 @@
          </div>
          <div id="layout__main">
 
-            {% block content %}
+            {% block content_base %}
+               {% block content %}
+               {% endblock %}
             {% endblock %}
 
          </div>

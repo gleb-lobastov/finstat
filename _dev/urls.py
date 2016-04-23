@@ -5,8 +5,9 @@ from django.conf import settings
 from . import views
 
 urlpatterns = patterns(
-        '',
-        url(r'^$', views.index, name='index'),
-        url(r'^finstat/', include('finstat.urls')),
-        url(r'^admin/', admin.site.urls),
+    '',
+    url(r'^$', views.index, name='index'),
+    url(r'^finstat/', include('finstat.urls')),
+    url(r'^admin/', admin.site.urls),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,59 +1,18 @@
 # -*- coding: UTF-8 -*-
-
+from enum import Enum
 from django.db import models
 from django.db.models.query import QuerySet
 from django.db.models import Case, When, Q, F
 from django.db.models import Count, Sum
 from django.contrib.auth.models import User
+from finstat.defaults import PAGE, PAGE_SIZE
 import finstat.modules.currency as currency
 
 
-class TransactionMixin(object):
-    def fetch(self, interval=None):
-        def none(param):
-            return param
-
-        if interval is not None:
-            if interval not in ('year', 'month', 'day'):
-                raise ValueError('Период {} не поддерживается'.format(interval))
-            clause = {'period': '''date_trunc('{}', date)'''.format(interval) if interval != 'day' else 'date'}
-            queryset = self.extra(select=clause)
-            agg = Sum
-        else:
-            queryset = self.annotate(period=F('date'))
-            agg = none
-        return (queryset
-                .annotate(category=F('fk_category__category_name'))
-                .annotate(account_from=F('fk_account_from__account_name'))
-                .annotate(account_to=F('fk_account_to__account_name'))
-                .values('period', 'category', 'comment', 'account_from', 'account_to')
-                .annotate(income=agg(Case(When(~Q(fk_account_from__account_type="OW") &
-                                               Q(fk_account_to__account_type='OW'),
-                                               then='amount'),
-                                          default=0)))
-                .annotate(outcome=agg(Case(When(~Q(fk_account_to__account_type='OW') &
-                                                Q(fk_account_from__account_type="OW"),
-                                                then='amount'),
-                                           default=0)))
-                .exclude(income=0, outcome=0)
-                .order_by('-period'))
-
-    def limit(self, limit=None, offset=None):
-        start = max(0, offset)
-        end = (limit + (start if start else 0)) if limit > 0 else None
-        return self[start:end]
-
-    def between(self, min_date, max_date):
-        return self.filter(date__range=(min_date, max_date))
-
-
-class TransactionQuerySet(QuerySet, TransactionMixin):
-    pass
-
-
-class TransactionManager(models.Manager, TransactionMixin):
-    def get_queryset(self):
-        return TransactionQuerySet(self.model, using=self._db)
+class Interval(Enum):
+    daily = 'daily'
+    monthly = 'monthly'
+    annual = 'annual'
 
 
 class Performer(models.Model):
@@ -69,11 +28,66 @@ class Performer(models.Model):
         return currency.render(self.default_currency)
 
 
+IS_INCOME = ~Q(fk_account_from__account_type="OW") & Q(fk_account_to__account_type='OW')
+IS_OUTCOME = Q(fk_account_from__account_type="OW") & ~Q(fk_account_to__account_type='OW')
+
+
+class TransactionQuerySet(models.QuerySet):
+    def __init__(self, model=None, query=None, using=None, hints=None):
+        super().__init__(model, query, using, hints)
+
+    def group_by(self, interval):
+        assert isinstance(interval, Interval)
+        return (
+            self.extra(select={'period': '''date_trunc('{precision}', date)'''.format(precision=interval.value)})
+                .values('period')
+                .annotate(income=Sum(Case(When(IS_INCOME, then='amount'), default=0)))
+                .annotate(outcome=Sum(Case(When(IS_OUTCOME, then='amount'), default=0)))
+                .exclude(income=0, outcome=0)
+                .order_by('-period')
+        )
+
+    def each(self):
+        return (
+            self.annotate(period=F('date'))
+                .annotate(category=F('fk_category__category_name'))
+                .annotate(account_from=F('fk_account_from__account_name'))
+                .annotate(account_to=F('fk_account_to__account_name'))
+                .values('period', 'category', 'comment', 'account_from', 'account_to')
+                .annotate(income=Sum(Case(When(IS_INCOME, then='amount'), default=0)))
+                .annotate(outcome=Sum(Case(When(IS_OUTCOME, then='amount'), default=0)))
+                .exclude(income=0, outcome=0)
+                .order_by('-period')
+        )
+
+    def between(self, min_date, max_date):
+        return self.filter(date__range=(min_date, max_date))
+
+    def at_page(self, page, page_size=PAGE_SIZE):
+        page = max(page, 1)
+        page_size = max(page_size, 1)
+
+        begin = (page - 1) * page_size
+        end = begin + page_size
+        return self[begin: end]
+
+
+class TransactionManager(models.Manager):
+    def get_queryset(self):
+        return TransactionQuerySet(self.model, using=self._db)
+
+    def group_by(self, interval):
+        return self.get_queryset().group_by(interval)
+
+    def each(self):
+        return self.get_queryset().each()
+
+    def at_page(self, page, page_size=PAGE_SIZE):
+        return self.get_queryset().at_page(page, page_size)
+
+
 class Transaction(models.Model):
     objects = TransactionManager()
-
-    # class Meta:
-    #     ordering = ["-date"]
 
     amount = models.IntegerField(default=0)
     comment = models.TextField(null=True, blank=True)
@@ -84,7 +98,6 @@ class Transaction(models.Model):
     fk_performer = models.ForeignKey('Performer')
     fk_place = models.ForeignKey('Place', null=True, blank=True)
     # tag = models.CharField(null=True, max_length=50, blank=True)
-    # from finstat.models import *; a=Transaction.objects.all()
 
     def __str__(self):
         def get_account_name(fk):

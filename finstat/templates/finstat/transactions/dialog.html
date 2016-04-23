@@ -1,0 +1,25 @@
+{% extends "finstat/index.html"|pjax:request %}
+
+{% load widget_tweaks %}
+
+<form class="form-inline" action="/transactions/add" method="post">
+   <div class="modal-body">
+      {% csrf_token %}
+      {% for field in form %}
+         <div class="fieldWrapper">
+            <div class="form-group">
+               {{ field.errors }}
+               {{ field.label_tag }}
+               {{ field| add_class:"form-control"| attr:"placeholder:label" }}
+               {% if field.help_text %}
+                  <p class="help">{{ field.help_text|safe }}</p>
+               {% endif %}
+            </div>
+         </div>
+      {% endfor %}
+   </div>
+   <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      <button type="submit" class="btn btn-primary">Submit</button>
+   </div>
+</form>

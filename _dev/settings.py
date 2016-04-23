@@ -29,6 +29,9 @@ TEMPLATES = [
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
+            "builtins": [
+                "easy_pjax.templatetags.pjax_tags"
+            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -47,6 +50,9 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = (
     'finstat',
     'layouts',
+    'easy_pjax',
+    # 'rest_framework',
+    'widget_tweaks',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -84,6 +90,9 @@ DATABASES = {
       'PASSWORD': 'glruDB123',
       'HOST': 'localhost', # Set to empty string for localhost.
       'PORT': '', # Set to empty string for default.
+      'TEST': {
+         'NAME': 'test_db'
+      }
    }
 }
 
@@ -109,3 +118,11 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     "static/",
 )
+
+# REST_FRAMEWORK = {
+#     # Use Django's standard `django.contrib.auth` permissions,
+#     # or allow read-only access for unauthenticated users.
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+#     ]
+# }

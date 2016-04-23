@@ -1,5 +1,11 @@
 {% load transactions_extras %}
 
+<div>
+{#   {% if paging.prev > 0 %}#}
+   <a href='/transactions/page{{ paging.prev }}' data-pjax>Предыдущая страница</a>
+{#   {% endif %}#}
+   <a href='/transactions/page{{ paging.next }}' data-pjax>Следующая страница</a>
+</div>
 {% for index, item in data %}
    <div class="finstat__bar finstat-show_on_hover-area">
       <div class="finstat__bar-index">{{ index }}</div>
