@@ -15,6 +15,37 @@ module.exports = function(grunt) {
             }
          }
       },
+      bower: {
+         dev: {
+            options: {
+               keepExpandedHierarchy: false,
+               packageSpecific: {
+                  bootstrap: {
+                     fonts_dest: 'dev/fonts',
+                     css_dest: 'dev/styles/vendor/bootstrap'
+                  },
+                  'bootstrap-datepicker': {
+                     files: ["dist/js/bootstrap-datepicker.js"]
+                  },            
+                  requirejs: {
+                     js_dest: 'static/dev/js'
+                  }
+               }
+            },
+            dest: 'static/dev/other/vendor',
+            js_dest: 'static/dev/js/vendor',
+            css_dest: 'static/dev/styles/vendor',
+            fonts_dest: 'static/dev/fonts'
+         }
+      },
+      copy: {
+         main: {
+            expand: true,
+            cwd: 'static/js',
+            src: '**',
+            dest: 'static/dev/js',
+         },
+      },
       sass: {
          dev: {
             options: {
@@ -51,7 +82,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-sass');
    grunt.loadNpmTasks('grunt-contrib-jshint');
    grunt.loadNpmTasks('grunt-contrib-watch');
+   grunt.loadNpmTasks('grunt-contrib-copy');
+   grunt.loadNpmTasks('grunt-bower');
 
-   grunt.registerTask('default', ['sass', 'jshint', 'watch']);
+   grunt.registerTask('default', ['bower', 'sass', 'jshint', 'watch']);
+   // grunt.registerTask('bower-setup', ['bower']);
 
 };

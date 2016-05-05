@@ -1,15 +1,9 @@
 {% extends "finstat/base-finstat.html" %}
 {% load transactions_extras %}
 
-{% block jquery_ready %}
-   {{ block.super }}
-   $(document).pjax('a[data-pjax]', '#finstat__data-container')
-{% endblock %}
-
 {% block content_base %}
    <h1> Finstat index </h1>
-   <div id="finstat__data-container">
    {% block content %}
+      <h2>Статистика</h2>
    {% endblock %}
-   </div>
 {% endblock %}

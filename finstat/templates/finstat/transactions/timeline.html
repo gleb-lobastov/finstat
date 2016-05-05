@@ -1,4 +1,4 @@
-{% extends "finstat/index.html"|pjax:request %}
+{% extends "finstat/transactions/index.html"|pjax:request %}
 
 {% load transactions_extras %}
 
@@ -17,7 +17,7 @@
    </div>
 
    <div class="finstat__day finstat__show-on-hover_area">
-   {% for index, item in data %}
+   {% for index, item in records %}
       {% ifchanged item.period %}
    </div>
    <div class="finstat__day finstat__show-on-hover_area">
@@ -71,7 +71,10 @@
             <div class="modal-header">
                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                      aria-hidden="true">&times;</span></button>
-               <h4 class="modal-title">Add new transaction</h4>
+               <h4 class="modal-title">Add new transaction
+               <div class="lgv__ajax-form">
+                  {% include "finstat/transactions/dialog.html" %}
+               </div>
             </div>
             <div id="#finstat__dialog-container"></div>
          </div><!-- /.modal-content -->

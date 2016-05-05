@@ -9,5 +9,8 @@ urlpatterns = patterns(
     url(r'^$', views.index, name='index'),
     url(r'^finstat/', include('finstat.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^accounts/login/', 'django.contrib.auth.views.login', {'template_name': 'admin/login.html'}),
+    url(r'^accounts/logout/', 'django.contrib.auth.views.logout'),
+    url(r'^accounts/profile/', 'django.contrib.admin.views.pr'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

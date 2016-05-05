@@ -2,19 +2,14 @@
 
 {% load staticfiles %}
 
+{% block app_name %}finstatApp{% endblock %}
+{% block config_file %}finstat/config{% endblock %}
+
 {% block styles %}
    {{ block.super }}
-   <link rel="stylesheet" href="{% static 'js/plugins/selectboxit/src/stylesheets/jquery.selectBoxIt.css' %}">
-   <link rel="stylesheet" href="{% static 'css/plugins/vnav/css/vnav.css' %}">
    <link rel="stylesheet" href="{% static 'finstat/finstat.css' %}">
    <link rel="stylesheet" href="{% static 'finstat/components.css' %}">
    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 {% endblock %}
 
-{% block scripts %}
-   {{ block.super }}
-   <script src="{% static 'js/plugins/selectboxit/src/javascripts/jquery.selectBoxIt.min.js' %}"></script>
-   <script src="{% static 'finstat/finstat.js' %}"></script>
-   <script src="{% static 'finstat/navigation.js' %}"></script>
-   <script src="{% static 'finstat/handlers.js' %}"></script>
-{% endblock %}
+

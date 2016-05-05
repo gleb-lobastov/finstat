@@ -61,7 +61,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # 'django.contrib.sites',
     # 'django.contrib.flatpages',
-    # 'finstat'
 )
 
 MIDDLEWARE_CLASSES = (

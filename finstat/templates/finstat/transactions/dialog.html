@@ -1,11 +1,13 @@
-{% extends "finstat/index.html"|pjax:request %}
+{#{% extends "finstat/transactions/timeline.html"|pjax:request %}#}
 
 {% load widget_tweaks %}
 
-<form class="form-inline" action="/transactions/add" method="post">
+{#{% block form %}#}
+<form id="finstat__form-edit-transaction" class="form-inline" action="/finstat/transactions/add" method="post">
    <div class="modal-body">
       {% csrf_token %}
       {% for field in form %}
+
          <div class="fieldWrapper">
             <div class="form-group">
                {{ field.errors }}
@@ -23,3 +25,4 @@
       <button type="submit" class="btn btn-primary">Submit</button>
    </div>
 </form>
+{#{% endblock %}#}
