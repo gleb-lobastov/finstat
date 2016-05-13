@@ -2,6 +2,10 @@
     text-align: right;
 }
 
+.format__center {
+    text-align: center;
+}
+
 .format__ellipsis {
    overflow: hidden;
    text-overflow: ellipsis;

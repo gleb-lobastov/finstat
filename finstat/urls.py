@@ -1,14 +1,15 @@
 from django.conf.urls import patterns, url
-from finstat import views
-from finstat.views import transactions
+from finstat.views import transactions, api
 
 urlpatterns = patterns(
     '',
-    # /finstat
-    # url(r'^$', views.index, name='finstat-index'),
-    url(r'^transactions$', transactions.transactions_list_view, {'page': 1}, name='finstat-transactions-index'),
-    url(r'^transactions/add$', transactions.post_add),
-    url(r'^transactions/page(?P<page>\d+)$', transactions.transactions_list_view, name='finstat-list_view'),
+    # rest api
+    url(r'^api/transactions/list$', api.TransactionsList.as_view(), name='transactions_list'),
+    url(r'^api/transactions/item/(?P<pk>[0-9]+)$', api.transactions_item, name='transaction_detail'),
+
+    # pjax supporting templates
+    url(r'^transactions$', transactions.timeline_pjax_html, {'page': 1}, name='finstat-transactions-index'),
+    url(r'^transactions/page(?P<page>\d+)$', transactions.timeline_pjax_html, name='finstat-list_view'),
     url(r'^transactions/(?P<interval>((daily)|(monthly)|(annual)))/page(?P<page>\d+)$',
         transactions.transactions_stats_view, name='finstat-transactions-overview'),
     # transactions/year2015/month10/day1

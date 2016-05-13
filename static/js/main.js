@@ -18,6 +18,9 @@ requirejs.config({
         },
         'jquery.pjax': {
             deps: ['jquery']
+        },
+        'datepicker': {
+            deps: ['jquery']
         }
     }
 });

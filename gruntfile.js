@@ -24,9 +24,12 @@ module.exports = function(grunt) {
                      fonts_dest: 'dev/fonts',
                      css_dest: 'dev/styles/vendor/bootstrap'
                   },
-                  'bootstrap-datepicker': {
-                     files: ["dist/js/bootstrap-datepicker.js"]
-                  },            
+                  // 'bootstrap-datepicker': {
+                     // files: ["dist/js/bootstrap-datepicker.js"]
+                  // },
+                  'air-datepicker': {
+                     files: ["dist/js/datepicker.js", "dist/css/datepicker.css"]
+                  },                              
                   requirejs: {
                      js_dest: 'static/dev/js'
                   }

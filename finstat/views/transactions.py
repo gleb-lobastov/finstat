@@ -1,10 +1,11 @@
+import datetime
 from finstat.defaults import PAGE, PAGE_SIZE
 from finstat.models import Transaction, Interval, Performer
 from finstat.forms import TransactionForm
 
 from django.template import loader, RequestContext
 from django.http import HttpResponse, Http404
-from django.shortcuts import render
+from django.shortcuts import render_to_response, redirect
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -37,12 +38,12 @@ def transactions_list(page=PAGE, page_size=PAGE_SIZE):
     }
 
 
-def transactions_list_view(request, page=PAGE, page_size=PAGE_SIZE):
+def timeline_pjax_html(request, page=PAGE, page_size=PAGE_SIZE):
     page = int(page)
     page_size = int(page_size)
     template = loader.get_template('finstat/transactions/timeline.html')
     data = transactions_list(page, page_size)
-    data['form'] = TransactionForm()
+    data['form'] = TransactionForm(initial={'date': datetime.date.today()})
     context = RequestContext(request, data)
     return HttpResponse(template.render(context))
 
@@ -73,10 +74,10 @@ def post_add(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = TransactionForm(request.POST, initial={'fk_performer': -1})
+        form = TransactionForm(request.POST, initial={'fk_performer': 1})
         # check whether it's valid:
         if form.is_valid():
-            form.fk_performer = Performer.objects.get(oo_performer=request.user.id).id
+            form.cleaned_data['fk_performer'] = Performer.objects.get(oo_performer=request.user.id).id
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
@@ -86,4 +87,4 @@ def post_add(request):
     else:
         form = TransactionForm()
 
-    return render(request, 'finstat/transactions/dialog.html', {'form': form})
+    return HttpResponseRedirect("/finstat/transactions")

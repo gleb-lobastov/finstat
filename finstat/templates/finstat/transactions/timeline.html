@@ -1,6 +1,8 @@
 {% extends "finstat/transactions/index.html"|pjax:request %}
 
 {% load transactions_extras %}
+{% load widget_tweaks %}
+
 
 {% block title %}
    Transactions, page {{ paging.index }}
@@ -16,27 +18,54 @@
       {% endif %}
    </div>
 
+{#   <form id="finstat__form-edit-transaction" class="form-inline" action="/finstat/api/transactions/list" method="post">#}
+{#      {% csrf_token %}#}
+{#      {{ form.non_field_errors }}#}
+{#         {% for field in form %}#}
+{#            {{ field.errors }}#}
+{#         {% endfor %}#}
+{#      <div class="form-group">#}
+{#         {{ form.date | add_class:"form-control ext__air-datepicker"}}#}
+{#      </div>#}
+{#      <div class="form-group">#}
+{#         {{ form.fk_category | add_class:"finstat__input-category"}}#}
+{#      </div>#}
+{#      <div class="form-group">#}
+{#         {{ form.amount | add_class:"form-control"}}#}
+{#      </div>#}
+{#      <div class="form-group">#}
+{#         {{ form.comment | add_class:"form-control"}}#}
+{#      </div>#}
+{#      <div class="form-group">#}
+{#         {{ form.fk_account_from | add_class:"finstat__input-account"}}#}
+{#      </div>#}
+{#      <span class="glyphicon glyphicon-arrow-right"></span>#}
+{#      <div class="form-group">#}
+{#         {{ form.fk_account_to | add_class:"finstat__input-account"}}#}
+{#      </div>#}
+{#      <button type="submit" class="btn btn-primary">Submit</button>#}
+{#   </form>#}
    <div class="finstat__day finstat__show-on-hover_area">
+      <div class="row">
+         <div class="col-md-12 format__center">
+            <span class="glyphicon glyphicon-plus"></span>
+         </div>
+      </div>
    {% for index, item in records %}
-      {% ifchanged item.period %}
+      {% ifchanged item.date %}
    </div>
    <div class="finstat__day finstat__show-on-hover_area">
-         <div class="row finstat__tall-row">
-            <div class="col-md-3 "></div>
-            <div class="col-md-3 finstat__separator format__right">
-               <button type="button" class="finstat__show-on-hover btn btn-default" data-toggle="modal"
-                       data-target="#finstat__new-record_dialog">
-                  <span class="glyphicon glyphicon-plus"></span>
-                  Add
-               </button>
-               <span>{{ item.period }}</span>
-            </div>
-            <div class="col-md-2">
-               <span class="finstat__bar-income"> +{{ item.income }} </span>
-               <span class="finstat__bar-outcome"> -{{ item.outcome }} </span>
-            </div>
-            <div class="col-md-4"></div>
+      <div class="row finstat__tall-row">
+         <div class="col-md-3 "></div>
+         <div class="col-md-3 finstat__separator format__right">
+            <span>{{ item.date }}</span>
          </div>
+         <div class="col-md-2">
+            <span class="finstat__bar-income"> +{{ item.income }} </span>
+            <span class="finstat__bar-outcome"> -{{ item.outcome }} </span>
+         </div>
+         <div class="col-md-4"></div>
+      </div>
       {% endifchanged %}
       <div class="row finstat__highlight-row">
          <div class="col-md-2"></div>
@@ -64,20 +93,4 @@
       </div>
    {% endfor %}
    </div>
-
-   <div id="finstat__new-record_dialog" class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog">
-         <div class="modal-content">
-            <div class="modal-header">
-               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                     aria-hidden="true">&times;</span></button>
-               <h4 class="modal-title">Add new transaction
-               <div class="lgv__ajax-form">
-                  {% include "finstat/transactions/dialog.html" %}
-               </div>
-            </div>
-            <div id="#finstat__dialog-container"></div>
-         </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-   </div><!-- /.modal -->
 {% endblock %}

@@ -9,7 +9,7 @@ class DateInput(forms.DateInput):
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        fields = ['date', 'amount', 'fk_account_from', 'fk_account_to', 'fk_category', 'fk_performer', 'comment']
+        fields = ['date', 'amount', 'fk_account_from', 'fk_account_to', 'fk_category', 'comment', 'fk_performer']
         labels = {
             'date': 'Дата',
             'amount': 'Сумма',
@@ -19,5 +19,12 @@ class TransactionForm(forms.ModelForm):
             'comment': 'Комментарий'
         }
         widgets = {
-            'date': DateInput(attrs={'class': 'form-control'}),
+            'date': forms.DateInput(),
+            'amount': forms.NumberInput(),
+            'fk_account_from': forms.Select(attrs={'class': "ext__chosen"}),
+            'fk_account_to': forms.Select(attrs={'class': "ext__chosen"}),
+            'fk_category': forms.Select(attrs={'class': "ext__chosen"}),
+            'fk_performer': forms.HiddenInput()
         }
+
+    comment = forms.CharField(label='Коммент')

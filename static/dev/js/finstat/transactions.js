@@ -1,8 +1,10 @@
-define(["vendor/jquery"], function($) {
+define(["vendor/jquery", "selectize"], function($) {
     $(document).ready(function () {
 
         $(document).pjax('a[data-pjax]', '#finstat__data-container');
-
+        
+        $(".ext__chosen").selectize();
+        
         $('.lgv__ajax-form').submit(function () {
             var
                 container = $(this),
@@ -19,4 +21,4 @@ define(["vendor/jquery"], function($) {
             return false;
         });
     });
-};
+});

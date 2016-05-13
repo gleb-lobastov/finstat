@@ -49,15 +49,14 @@ class TransactionQuerySet(models.QuerySet):
 
     def each(self):
         return (
-            self.annotate(period=F('date'))
-                .annotate(category=F('fk_category__category_name'))
+            self.annotate(category=F('fk_category__category_name'))
                 .annotate(account_from=F('fk_account_from__account_name'))
                 .annotate(account_to=F('fk_account_to__account_name'))
-                .values('period', 'category', 'comment', 'account_from', 'account_to')
+                .values('date', 'category', 'comment', 'account_from', 'account_to')
                 .annotate(income=Sum(Case(When(IS_INCOME, then='amount'), default=0)))
                 .annotate(outcome=Sum(Case(When(IS_OUTCOME, then='amount'), default=0)))
                 .exclude(income=0, outcome=0)
-                .order_by('-period')
+                .order_by('-date')
         )
 
     def between(self, min_date, max_date):

@@ -51,7 +51,7 @@ INSTALLED_APPS = (
     'finstat',
     'layouts',
     'easy_pjax',
-    # 'rest_framework',
+    'rest_framework',
     'widget_tweaks',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -118,10 +118,13 @@ STATICFILES_DIRS = (
     "static/",
 )
 
-# REST_FRAMEWORK = {
-#     # Use Django's standard `django.contrib.auth` permissions,
-#     # or allow read-only access for unauthenticated users.
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-#     ]
-# }
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+    ],
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     'rest_framework.renderers.<corresponding_renderer>',
+    # )
+}
