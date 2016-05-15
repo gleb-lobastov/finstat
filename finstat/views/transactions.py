@@ -74,7 +74,7 @@ def post_add(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
-        form = TransactionForm(request.POST, initial={'fk_performer': 1})
+        form = TransactionForm(request.POST, initial={'fk_performer': 1, 'amount': ''})
         # check whether it's valid:
         if form.is_valid():
             form.cleaned_data['fk_performer'] = Performer.objects.get(oo_performer=request.user.id).id

@@ -1,29 +1,34 @@
-//define('require/config', [], function () {
-//    requirejs.config({
-//        baseUrl: '/static/dev/js/vendor',
-//        paths: {
-//            finstat: '../../js/finstat'
+//requirejs.config({
+//    baseUrl: '/static/dev/js/vendor',
+//    packages: [{
+//            name: 'finstat',
+//            location: '../../../js/finstat',  
+//            main: 'config' 
+//        }],
+////    paths: {
+////        finstat: '../../../../js/finstat'
+////    },
+//    shim: {
+//        'bootstrap': {
+//            deps: ['jquery']
 //        },
-//        shim: {
-//            bootstrap : {
-//                deps: ['jquery']
-//            },
-//            'bootstrap-datepicker' : {
-//                deps: ['bootstrap', 'jquery']
-//            },
-//            underscore: {
-//                exports: '_'
-//            },
-//            backbone: {
-//                deps: [
-//                    'underscore',
-//                    'jquery'
-//                ],
-//                exports: 'Backbone'
-//            },
-//            'jquery.pjax': {
-//                deps: ['jquery']
-//            }
+//        'bootstrap-datepicker': {
+//            deps: ['bootstrap', 'jquery']
+//        },
+//        'underscore': {
+//            exports: '_'
+//        },
+//        'angular': {
+//            exports: 'angular'
+//        },
+//        'jquery.pjax': {
+//            deps: ['jquery']
+//        },
+//        'datepicker': {
+//            deps: ['jquery']
+//        },
+//        'bootstrap-editable': {
+//            deps: ['bootstrap', 'jquery']
 //        }
-//    });    
+//    }
 //});

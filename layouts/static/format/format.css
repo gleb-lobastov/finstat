@@ -6,6 +6,10 @@
     text-align: center;
 }
 
+.format__relative {
+    position: relative;
+}
+
 .format__ellipsis {
    overflow: hidden;
    text-overflow: ellipsis;

@@ -18,21 +18,46 @@
       {% endif %}
    </div>
 
-{#   <form id="finstat__form-edit-transaction" class="form-inline" action="/finstat/api/transactions/list" method="post">#}
-{#      {% csrf_token %}#}
+   <form id="finstat__form-edit-transaction" class="form-inline" action="/finstat/api/transactions/list" method="post">
+      {% csrf_token %}
 {#      {{ form.non_field_errors }}#}
 {#         {% for field in form %}#}
 {#            {{ field.errors }}#}
 {#         {% endfor %}#}
 {#      <div class="form-group">#}
-{#         {{ form.date | add_class:"form-control ext__air-datepicker"}}#}
-{#      </div>#}
-{#      <div class="form-group">#}
 {#         {{ form.fk_category | add_class:"finstat__input-category"}}#}
 {#      </div>#}
-{#      <div class="form-group">#}
-{#         {{ form.amount | add_class:"form-control"}}#}
-{#      </div>#}
+      <div class="finstat__day finstat__show-on-hover_area">
+         <div class="col-md-12 format__center finstat__add-icon">
+            <div class="form-group format__relative">
+               <div class="format__minor finstat__fast-date-switcher">
+                  <div>Вчера</div>
+                  <div>Позавчера</div>
+               </div>
+               {{ form.date | add_class:"form-control ext__air-datepicker"}}
+            </div>
+            <span class="glyphicon glyphicon-ok finstat__submit-icon"></span>
+            <div class="form-group format__relative">
+               {{ form.amount | add_class:"form-control" | attr:"placeholder:Сумма"}}
+               <div class="format__minor finstat__extra-switcher">
+                  <div>&nbsp;</div> {# занимает верхнюю строчку #}
+                  <div
+                     class="ext__editable-for-insert"
+                     data-type="transactionsXFields"
+                     data-name="category"
+                     data-title="Дополнительно"
+                  >
+                     еще
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="format__hidden" id="finstat__extra-popup-tpl">
+         <div>
+            {{ form.fk_category | add_class:"finstat__input-category"}}
+         </div>
+      </div>
 {#      <div class="form-group">#}
 {#         {{ form.comment | add_class:"form-control"}}#}
 {#      </div>#}
@@ -44,10 +69,10 @@
 {#         {{ form.fk_account_to | add_class:"finstat__input-account"}}#}
 {#      </div>#}
 {#      <button type="submit" class="btn btn-primary">Submit</button>#}
-{#   </form>#}
+   </form>
    <div class="finstat__day finstat__show-on-hover_area">
       <div class="row">
-         <div class="col-md-12 format__center">
+         <div class="col-md-12 format__center finstat__add-icon">
             <span class="glyphicon glyphicon-plus"></span>
          </div>
       </div>
@@ -72,11 +97,25 @@
          <div class="col-md-4 finstat__separator format__right">
             <div class="format__inline-block format__ellipsis format__minor">{{ item.category }}</div>
             <div class="format__inline-block finstat__money">
-               {% if item.income > 0 %}
-                  <span class="finstat__bar-income"> +{{ item.income }} </span>
-               {% else %}
-                  <span class="finstat__bar-outcome"> -{{ item.outcome }} </span>
-               {% endif %}
+               <span
+                  class="
+                     {% if item.income > 0 %}
+                        finstat__bar-income
+                     {% else %}
+                        finstat__bar-outcome
+                     {% endif %}
+                        ext__editable-for-update"
+                  data-type="text"
+                  data-name="amount"
+                  data-url="/finstat/api/transactions/item/{{ item.id }}"
+                  data-title="Сумма"
+               >
+                  {% if item.income > 0 %}
+                     +{{ item.income }}
+                  {% else %}
+                     -{{ item.outcome }}
+                  {% endif %}
+               </span>
             </div>
          </div>
          <div class="col-md-3 format__ellipsis">{{ item.comment }}</div>

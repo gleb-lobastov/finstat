@@ -1,7 +1,8 @@
 requirejs.config({
     baseUrl: '/static/dev/js/vendor',
     paths: {
-        finstat: '../../js/finstat'
+        finstat: '../../../js/finstat',
+        addon: '../../../components/addons'
     },
     shim: {
         'bootstrap': {
@@ -21,6 +22,9 @@ requirejs.config({
         },
         'datepicker': {
             deps: ['jquery']
+        },
+        'bootstrap-editable': {
+            deps: ['bootstrap', 'jquery']
         }
     }
 });

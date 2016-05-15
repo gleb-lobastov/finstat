@@ -52,7 +52,7 @@ class TransactionQuerySet(models.QuerySet):
             self.annotate(category=F('fk_category__category_name'))
                 .annotate(account_from=F('fk_account_from__account_name'))
                 .annotate(account_to=F('fk_account_to__account_name'))
-                .values('date', 'category', 'comment', 'account_from', 'account_to')
+                .values('id', 'date', 'category', 'comment', 'account_from', 'account_to')
                 .annotate(income=Sum(Case(When(IS_INCOME, then='amount'), default=0)))
                 .annotate(outcome=Sum(Case(When(IS_OUTCOME, then='amount'), default=0)))
                 .exclude(income=0, outcome=0)

@@ -57,7 +57,7 @@ def transactions_item(request, pk):
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = TransactionSerializer(task, data=request.DATA)
+        serializer = TransactionSerializer(task, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
