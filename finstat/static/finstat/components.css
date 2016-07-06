@@ -36,6 +36,11 @@
    color: indianred;
 }
 
+.finstat__bar-outcome::before {
+   /*color: indianred;*/
+   content: "-";
+}
+
 .finstat__bar-income,
 .finstat__bar-outcome {
    width: 60px;

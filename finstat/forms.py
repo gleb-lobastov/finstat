@@ -20,7 +20,7 @@ class TransactionForm(forms.ModelForm):
         }
         widgets = {
             'date': forms.DateInput(),
-            'amount': forms.NumberInput(),
+            'amount': forms.TextInput(),
             'fk_account_from': forms.Select(attrs={'class': "ext__chosen"}),
             'fk_account_to': forms.Select(attrs={'class': "ext__chosen"}),
             'fk_category': forms.Select(attrs={'class': "ext__chosen"}),

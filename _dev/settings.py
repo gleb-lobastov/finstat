@@ -48,8 +48,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-    'finstat',
+    'face',
     'layouts',
+    'finstat',
     'easy_pjax',
     'rest_framework',
     'widget_tweaks',
@@ -127,4 +128,6 @@ REST_FRAMEWORK = {
     # 'DEFAULT_RENDERER_CLASSES': (
     #     'rest_framework.renderers.<corresponding_renderer>',
     # )
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100
 }

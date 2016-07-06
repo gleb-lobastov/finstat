@@ -20,9 +20,12 @@ module.exports = function (grunt) {
                 options: {
                     keepExpandedHierarchy: false,
                     packageSpecific: {
-                        bootstrap: {
-                            fonts_dest: 'dev/fonts',
-                            css_dest: 'dev/styles/vendor/bootstrap'
+                        'bootstrap': {
+                            files: [
+                                'dist/css/bootstrap.css',
+                                'dist/fonts/*',
+                                'dist/js/bootstrap.js',
+                            ]
                         },
                         'x-editable': {
                             files: [
@@ -40,15 +43,18 @@ module.exports = function (grunt) {
                         'doT': {
                             files: ["doT.js"]
                         },
+                        'typeahead.js': {
+                            files: ["dist/typeahead.jquery.js"]
+                        },
                         requirejs: {
-                            js_dest: 'static/dev/js'
+                            js_dest: 'static/js'
                         }
                     }
                 },
-                dest: 'static/dev/other/vendor',
-                js_dest: 'static/dev/js/vendor',
-                css_dest: 'static/dev/styles/vendor',
-                fonts_dest: 'static/dev/fonts'
+                dest: 'static/other/vendor',
+                js_dest: 'static/js/vendor',
+                css_dest: 'static/styles/vendor',
+                fonts_dest: 'static/styles/fonts'
             }
         },
         copy: {

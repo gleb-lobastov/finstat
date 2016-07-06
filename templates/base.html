@@ -2,32 +2,19 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="{% block app_name %}defaultApp{% endblock %}">
 <head>
-   <link rel="stylesheet" href="{% static 'dist/base.css' %}" />
    <title>{% block title %}My amazing site{% endblock %}</title>
-   <!-- production dependencies
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-   <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css">
-   -->
+
+   {# Основные стили. Все прочие должны быть добавлены через require.js #}
    {% block styles %}
-      <link rel="stylesheet" href="{% static 'bower_components/jquery-ui/themes/smoothness/jquery-ui.css' %}">
-      <link rel="stylesheet" href="{% static 'bower_components/jquery-ui/themes/smoothness/jquery-ui.theme.css' %}">
-      <link rel="stylesheet" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.css' %}">
-{#      <link rel="stylesheet" href="{% static 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css' %}">#}
-      <link rel="stylesheet" href="{% static 'bower_components/normalize-css/normalize.css' %}">
-      <link rel="stylesheet" href="{% static 'dev/styles/vendor/selectize.css' %}">
-      <link rel="stylesheet" href="{% static 'dev/styles/vendor/datepicker.css' %}">
-      <link rel="stylesheet" href="{% static 'components/rouble/b-rub_georgia/stylesheet.css' %}">
+      <link rel="stylesheet" href="{% static 'styles/vendor/bootstrap.css' %}">
+      <link rel="stylesheet" href="{% static 'styles/vendor/normalize.css' %}">
    {% endblock %}
-   {% block scripts %}
-      <script data-main="{% static 'js/' %}{% block config_file %}main{% endblock %}"
-              src="{% static 'dev/js/require.js' %}"></script>
-{#      <script src="{% static 'bower_components/jquery/dist/jquery.js' %}"></script>#}
-{#      <script src="{% static 'bower_components/jquery-pjax/jquery.pjax.js' %}"></script>#}
-{#      <script src="{% static 'bower_components/jquery-ui/jquery-ui.js' %}"></script>#}
-{#      <script src="{% static 'plugins/jquery-ui/widgets/combobox.js' %}"></script>#}
-{#      <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.js' %}"></script>#}
-{#      <script src="{% static 'bower_components/moment/moment.js' %}"></script>#}
-   {% endblock %}
+
+   {# Точка входа в js (RequireJS) #}
+   <script data-main="{% static '' %}{% block config_file %}main{% endblock %}" src="{% static 'js/require.js' %}"></script>
+
+{#   <link rel="stylesheet" href="{% static 'dist/base.css' %}" />#}
+{#      <link rel="stylesheet" href="{% static 'components/rouble/b-rub_georgia/stylesheet.css' %}">#}
 </head>
 
 <body>

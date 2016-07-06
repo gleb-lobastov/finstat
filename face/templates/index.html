@@ -1,0 +1,24 @@
+{% extends "layouts/sticky_footer.html" %}
+
+{% block config_file %}js/config{% endblock %}
+
+{% block content_base %}
+   <h1> Главная страница </h1>
+   {% block content %}
+   <div class="MARKUP__absolute">
+       <ul class="MARKUP__listOnMainPage">
+           <li><span class="CTRL__goSection">Путешествия</span></li>
+           <li><span class="CTRL__goSection"><a href="/finstat/transactions">Деньги</a></span></li>
+           <li><span class="CTRL__goSection">Буквы</span></li>
+           <li><span class="CTRL__goSection">Код</span></li>
+       </ul>
+   </div>
+   {% endblock %}
+{% endblock %}
+
+{% block sidebar_1 %}
+   <ul>
+      <li>Финстат</li>
+      <li>Путешествия</li>
+   </ul>
+{% endblock %}

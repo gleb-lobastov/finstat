@@ -47,6 +47,11 @@ def timeline_pjax_html(request, page=PAGE, page_size=PAGE_SIZE):
     context = RequestContext(request, data)
     return HttpResponse(template.render(context))
 
+def base_view(request):
+    template = loader.get_template('finstat/transactions/base.html')
+    context = RequestContext(request, {})
+    return HttpResponse(template.render(context))
+
 
 def transactions_stats(interval, page=PAGE, page_size=PAGE_SIZE):
     records = Transaction.objects.group_by(Interval(interval)).at_page(page, page_size)

@@ -50,9 +50,7 @@ class TransactionQuerySet(models.QuerySet):
     def each(self):
         return (
             self.annotate(category=F('fk_category__category_name'))
-                .annotate(account_from=F('fk_account_from__account_name'))
-                .annotate(account_to=F('fk_account_to__account_name'))
-                .values('id', 'date', 'category', 'comment', 'account_from', 'account_to')
+                .values('id', 'date', 'category', 'comment', 'fk_account_from', 'fk_account_to')
                 .annotate(income=Sum(Case(When(IS_INCOME, then='amount'), default=0)))
                 .annotate(outcome=Sum(Case(When(IS_OUTCOME, then='amount'), default=0)))
                 .exclude(income=0, outcome=0)
@@ -96,6 +94,7 @@ class Transaction(models.Model):
     fk_category = models.ForeignKey('Category', null=True, blank=True)
     fk_performer = models.ForeignKey('Performer')
     fk_place = models.ForeignKey('Place', null=True, blank=True)
+
     # tag = models.CharField(null=True, max_length=50, blank=True)
 
     def __str__(self):
@@ -111,23 +110,21 @@ class Transaction(models.Model):
             performer=self.fk_performer.oo_performer.username
         )
 
+
 # todo AccountAccess
 
 
 class Tag(models.Model):
-
     definition = models.CharField(max_length=250)
     shortening = models.CharField(max_length=50, unique=True)
 
-    
-class TagTransactionLink(models.Model):
 
+class TagTransactionLink(models.Model):
     fk_tag = models.ForeignKey('Tag', null=False, blank=False)
     fk_transaction = models.ForeignKey('Transaction', null=False, blank=False)
 
 
 class Account(models.Model):
-
     ACC_GROUP = 'GR'
     ACC_OWN = 'OW'
     ACC_DEBT = 'DE'
@@ -174,7 +171,8 @@ class Account(models.Model):
 
     def currency_render(self):
         return currency.render(self.currency)
-    # def date_of_first_use, date_of_last_use, value_on_date, value
+        # def date_of_first_use, date_of_last_use, value_on_date, value
+
 
 # todo BounceSystem
 # todo Captures - данные о состоянии счета на конец такой-то даты
@@ -191,14 +189,13 @@ class CurrencyRate(models.Model):
 
 
 class Category(models.Model):
-
     DIRECTIONS = {
         None: "",
         0: "Outcome",
         1: "Income",
         2: "Transfer"
     }
-    
+
     category_name = models.CharField(max_length=200)
     direction = models.IntegerField(null=True, default=0)
     parent_id = models.ForeignKey('self', null=True)
@@ -209,6 +206,7 @@ class Category(models.Model):
             direction=self.DIRECTIONS.get(self.direction, 'n/d'),
             category=self.category_name
         )
+
 
 # todo CategoryGroups
 # todo Details and Products
