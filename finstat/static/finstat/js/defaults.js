@@ -8,6 +8,11 @@ define([], function () {
             rowIncome: 'finstat__bar-income', 
             rowOutcome: 'finstat__bar-outcome'
         },
+        plugins: {
+           editable: {
+              
+           }
+        },
         currency: 'RUB',
         account: 'Г',
         account_type: 'OW',

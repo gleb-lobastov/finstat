@@ -1,20 +1,57 @@
 // Точка входа приложения finstat
 require(["config"], function (document) {
-    // Чтобы резолвить зависимости сначала подгружаем конфиг requirejs.
-    // Для корректной работы angular нужно что-бы DOM был уже загружен
-    require([
-        "jquery",
-        "finstat/helpers",
-        "finstat/transactions/view",
-        "bootstrap"
-    ], function ($, helpers, IntervalsView) {
-        var intervalsView = new IntervalsView();
-        intervalsView.on('rendered', function () {
-            var self = this;
-            $(document).ready(function () {
-                $('#finstat__transactions-content').append(self.$el);
-            });
-        });
+   // Чтобы резолвить зависимости сначала подгружаем конфиг requirejs.
+   // Для корректной работы angular нужно что-бы DOM был уже загружен
+   require([
+      "jquery",
+      "finstat/helpers",
+      "finstat/interval/view",
+      "finstat/accounts/collection",
+      "bootstrap",
+      "bootstrap-editable"
+   ], function ($, helpers, intervals, AccountsCollection) {
+
+      intervals.init({
+         turnEditable: turnEditable,
+         accountsCollection: new AccountsCollection()
+      });
+      var intervalsView = new intervals.IntervalsView();
+      intervalsView.on('rendered', function () {
+         var self = this;
+         $(document).ready(function () {
+            $('#finstat__transactions-content').append(self.$el);
+         });
+      });
+
+      function turnEditable() {
+         var self = this;
+         $.fn.editable.defaults.ajaxOptions = {
+            beforeSend: function (xhr) {
+               xhr.setRequestHeader("X-CSRFToken", helpers.getCookie('csrftoken'));
+            }
+         };
+
+         this.$el.find('.ext__editable-for-insert').editable();
+
+         this.$el.find('.ext__editable-for-update').editable({
+            ajaxOptions: {
+               type: "PUT",
+               beforeSend: $.fn.editable.defaults.ajaxOptions.beforeSend
+            },
+            send: 'always',
+//            mode: 'inline',
+            params: function (params) {
+               var result = {};
+               result[params.name] = params.value;
+               return result;
+            },
+            success: function (response, newValue) {
+               self.model.set('amount', newValue); //update backbone model
+            }
+         });
+      }
+   });
+});
 //        IntervalsView.init({
 //            target: '#finstat__transactions-content',
 //            onAfterRender: function () {
@@ -25,37 +62,14 @@ require(["config"], function (document) {
 //                    });
 //                });
 //                
-//                require(['bootstrap-editable'/*, 'addon/x-editable/transactionXFields'*/], function () {
-//                    $.fn.editable.defaults.ajaxOptions = {
-//                        beforeSend: function (xhr) {
-//                            xhr.setRequestHeader("X-CSRFToken", helpers.getCookie('csrftoken'));
-//                        }
-//                    };
-//
-//                    $('.ext__editable-for-insert').editable();
-//
-//                    $('.ext__editable-for-update').editable({
-//                        ajaxOptions: {
-//                            type: "PUT",
-//                            beforeSend: $.fn.editable.defaults.ajaxOptions.beforeSend
-//                        },
-//                        send: 'always',
-//                        params: function (params) {
-//                            var result = {};
-//                            result[params.name] = params.value;
-//                            return result;
-//                        }
-//                    });
-//                });
-//            }
-//        });
+
 //        $(document).ready(function () {
 //            $().append($transactions);
 //        });
-        // $('.ext__chosen').selectize();
-        // $('.ext__chosen').find('.selectize-input').addClass('form-control')
+// $('.ext__chosen').selectize();
+// $('.ext__chosen').find('.selectize-input').addClass('form-control')
 
-        // $('#id_amount').on('keydown', function (e) {
+// $('#id_amount').on('keydown', function (e) {
 //                var keyCode = e.keyCode || e.which;
 //                if (keyCode == 9) {
 //                    e.preventDefault();
@@ -63,13 +77,13 @@ require(["config"], function (document) {
 //                }
 //            });
 
-        // $('.finstat__submit-icon').click(function () {
+// $('.finstat__submit-icon').click(function () {
 //                $.post('/finstat/api/transactions/list', $('form#finstat__form-edit-transaction').serialize(), function (data) {
 //                    console.dir(this);
 //                });
 //            });
 
-        // $('.finstat__extra-switcher').popover({
+// $('.finstat__extra-switcher').popover({
 //                placement: 'bottom',
 //                 content: $('#finstat__extra-popup-tpl').html(),
 //                html: true
@@ -115,5 +129,5 @@ require(["config"], function (document) {
 //                return false;
 //            });
 //        });
-    });
-});
+//            });
+//        });

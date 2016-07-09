@@ -1,11 +1,12 @@
-define([
-    'finstat/accounts/collection'//,
+//define([
+//    'backbone',
+//    'underscore',
 //    'finstat/transactions/def'
-], function (AccountsCollection/*, TransactionsCollection*/) {
-    return {
-        collections: {
-            accounts: new AccountsCollection()//,
+//], function (Backone, _, AccountsCollection/*, TransactionsCollection*/) {
+//    return {
+//        collections: {
+//            accounts: new AccountsCollection()//,
 //            transactions: new TransactionsCollection()
-        }
-    }
-});
+//        }
+//    }
+//});
