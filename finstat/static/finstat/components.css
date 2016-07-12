@@ -36,7 +36,7 @@
    color: indianred;
 }
 
-.finstat__bar-outcome::before {
+.finstat__bar-outcome:not(:empty)::before {
    /*color: indianred;*/
    content: "-";
 }

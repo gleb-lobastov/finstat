@@ -2,7 +2,7 @@
 from enum import Enum
 from django.db import models
 from django.db.models.query import QuerySet
-from django.db.models import Case, When, Q, F
+from django.db.models import Case, When, Q, F, Value
 from django.db.models import Count, Sum
 from django.contrib.auth.models import User
 from finstat.defaults import PAGE, PAGE_SIZE
@@ -28,11 +28,22 @@ class Performer(models.Model):
         return currency.render(self.default_currency)
 
 
-IS_INCOME = ~Q(fk_account_from__account_type="OW") & Q(fk_account_to__account_type='OW')
-IS_OUTCOME = Q(fk_account_from__account_type="OW") & ~Q(fk_account_to__account_type='OW')
-
-
 class TransactionQuerySet(models.QuerySet):
+    TT_INCOME = 1
+    TT_OUTCOME = 2
+    TT_MOVE_OWN = 3
+    TT_MOVE_OTHER = 4
+
+    IS_INCOME = (
+        Q(fk_account_to__account_type='OW') &
+        (Q(fk_account_from__isnull=True) | ~Q(fk_account_from__account_type="OW"))
+    )
+    IS_OUTCOME = (
+        Q(fk_account_from__account_type="OW") &
+        (Q(fk_account_to__isnull=True) | ~Q(fk_account_to__account_type='OW'))
+    )
+    IS_MOVE_OWN = Q(fk_account_from__account_type="OW") & Q(fk_account_to__account_type='OW')
+    
     def __init__(self, model=None, query=None, using=None, hints=None):
         super().__init__(model, query, using, hints)
 
@@ -41,20 +52,21 @@ class TransactionQuerySet(models.QuerySet):
         return (
             self.extra(select={'period': '''date_trunc('{precision}', date)'''.format(precision=interval.value)})
                 .values('period')
-                .annotate(income=Sum(Case(When(IS_INCOME, then='amount'), default=0)))
-                .annotate(outcome=Sum(Case(When(IS_OUTCOME, then='amount'), default=0)))
+                .annotate(income=Sum(Case(When(self.IS_INCOME, then='amount'), default=0)))
+                .annotate(outcome=Sum(Case(When(self.IS_OUTCOME, then='amount'), default=0)))
                 .exclude(income=0, outcome=0)
                 .order_by('-period')
         )
 
     def each(self):
         return (
-            self.annotate(category=F('fk_category__category_name'))
-                .values('id', 'date', 'category', 'comment', 'fk_account_from', 'fk_account_to')
-                .annotate(income=Sum(Case(When(IS_INCOME, then='amount'), default=0)))
-                .annotate(outcome=Sum(Case(When(IS_OUTCOME, then='amount'), default=0)))
-                .exclude(income=0, outcome=0)
-                .order_by('-date')
+            self.annotate(transaction_type=Case(
+                When(self.IS_INCOME, then=Value(self.TT_INCOME)),
+                When(self.IS_OUTCOME, then=Value(self.TT_OUTCOME)),
+                When(self.IS_MOVE_OWN, then=Value(self.TT_MOVE_OWN)),
+                default=Value(self.TT_MOVE_OTHER),
+                output_field=models.IntegerField()
+            )).order_by('-date')
         )
 
     def between(self, min_date, max_date):

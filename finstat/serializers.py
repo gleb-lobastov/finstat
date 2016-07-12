@@ -3,15 +3,16 @@ from finstat import models
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-
-    # period = serializers.SerializerMethodField('get_date')
-
     class Meta:
         model = models.Transaction
-        fields = ('date', 'amount', 'comment', 'fk_account_from', 'fk_account_to', 'fk_category', 'fk_performer')
+        fields = (
+            'id', 'date', 'amount', 'comment',
+            'fk_account_from', 'fk_account_to', 'fk_category', 'fk_performer',
+            'transaction_type'
+        )
 
-    # def get_date(self, obj):
-    #     return obj.date
+    fk_performer = serializers.ReadOnlyField(source='fk_performer.id')
+    transaction_type = serializers.ReadOnlyField()
 
 
 class TransactionSerializerPartial(serializers.Serializer):
@@ -29,3 +30,7 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Account
 
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Category

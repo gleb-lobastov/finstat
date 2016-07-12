@@ -11,11 +11,36 @@ class AccountList(generics.ListCreateAPIView):
     permission_classes = (permissions.AllowAny,)
 
 
+class CategoryList(generics.ListCreateAPIView):
+    queryset = models.Category.objects.all()
+    serializer_class = serializers.CategorySerializer
+    permission_classes = (permissions.AllowAny,)
+
+
+class TransactionMixin(object):
+    queryset = models.Transaction.objects.each()
+    serializer_class = serializers.TransactionSerializer
+    permission_classes = (permissions.AllowAny,)
+    # permission_classes = (IsOwnerOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(fk_performer=models.Performer.objects.get(oo_performer=self.request.user.id or 1))
+
+
+class TransactionList(TransactionMixin, generics.ListCreateAPIView):
+    pass
+
+
+class TransactionDetail(TransactionMixin, generics.RetrieveUpdateDestroyAPIView):
+    pass
+
+
+"""
 class TransactionsList(generics.ListCreateAPIView):
     queryset = models.Transaction.objects.all()
     serializer_class = serializers.TransactionSerializer
     permission_classes = (permissions.AllowAny,)
-
+"""
     # def _append_performer(self, serializer):
     #     serializer.save(fk_performer=Performer.objects.get(oo_performer=self.request.user.id).id)
         # pass
@@ -26,18 +51,19 @@ class TransactionsList(generics.ListCreateAPIView):
     # def perform_update(self, serializer):
     #     self._append_performer(serializer)
 
+
 class TransactionsListPartial(generics.ListCreateAPIView):
     queryset = models.Transaction.objects.each()
     serializer_class = serializers.TransactionSerializerPartial
     permission_classes = (permissions.AllowAny,)
 
-
+"""
 @api_view(['GET', 'POST'])
 @permission_classes((permissions.AllowAny,))
 def transactions_list(request):
-    """
+    " ""
     List all transactions, or create a new one.
-    """
+    " ""
     if request.method == 'GET':
         tasks = models.Transaction.objects.all()
         serializer = serializers.TransactionSerializer(tasks, many=True)
@@ -56,9 +82,9 @@ def transactions_list(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes((permissions.AllowAny,))
 def transactions_item(request, pk):
-    """
+    " " "
     Get, udpate, or delete a specific task
-    """
+    " " "
     try:
         task = models.Transaction.objects.get(pk=pk)
     except models.Transaction.DoesNotExist:
@@ -80,3 +106,4 @@ def transactions_item(request, pk):
     elif request.method == 'DELETE':
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+"""

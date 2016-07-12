@@ -6,14 +6,13 @@ require(["config"], function (document) {
       "jquery",
       "finstat/helpers",
       "finstat/interval/view",
-      "finstat/accounts/collection",
+//      "finstat/accounts/collection",
       "bootstrap",
       "bootstrap-editable"
-   ], function ($, helpers, intervals, AccountsCollection) {
+   ], function ($, helpers, intervals) {
 
       intervals.init({
-         turnEditable: turnEditable,
-         accountsCollection: new AccountsCollection()
+         turnEditable: turnEditable
       });
       var intervalsView = new intervals.IntervalsView();
       intervalsView.on('rendered', function () {

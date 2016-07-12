@@ -1,0 +1,50 @@
+<div class="finstat__day finstat__show-on-hover_area">
+   <div class="col-md-12 format__center finstat__add-icon">
+      <div class="form-group format__relative">
+         <div class="format__minor finstat__fast-date-switcher">
+            <div>Вчера</div>
+            <div>Позавчера</div>
+         </div>
+         <input class="form-control ext__air-datepicker" id="id_date" name="date" type="text" value="<%=date%>">
+      </div>
+      <span class="glyphicon glyphicon-ok finstat__submit-icon"></span>
+      <div class="form-group format__relative">
+         <input class="form-control" id="id_amount" name="amount" placeholder="Сумма" type="text" value="<%=amount%>">
+         <div class="format__minor finstat__extra-switcher">
+            <div>&nbsp;</div>
+            <!-- занимает верхнюю строчку -->
+            <div
+                  class="ext__editable-for-insert"
+                  data-type="transactionsXFields"
+                  data-name="category"
+                  data-title="Дополнительно"
+            >
+               еще
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<div class="format__hidden" id="finstat__extra-popup-tpl">
+   <select class="ext__chosen finstat__input-category" id="id_fk_category" name="fk_category">
+      <option value="" selected="selected">---------</option>
+      <option value="2">Outcome: Transfer between own accounts</option>
+      <option value="147">Outcome: Обмен валют</option>
+      <option value="66">Outcome: Деньги от родных</option>
+   </select>
+</div>
+<div class="format__hidden" id="finstat__extra-popup-tpl">
+   <div>
+      <input class="finstat__input-category" id="id_fk_performer" name="fk_performer" type="hidden" value="1"/>
+   </div>
+</div>
+<div class="format__hidden" id="finstat__extra-popup-tpl">
+   <div>
+      <input class="finstat__input-category" id="id_fk_account_from" name="fk_account_from" type="hidden" value="1"/>
+   </div>
+</div>
+<div class="format__hidden" id="finstat__extra-popup-tpl">
+   <div>
+      <input class="finstat__input-category" id="id_fk_account_to" name="fk_account_to" type="hidden" value="0"/>
+   </div>
+</div>

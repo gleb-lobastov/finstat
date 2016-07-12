@@ -52,7 +52,7 @@ body {
     background-color: lightyellow;
 }
 
-.finstat__tall-row > div{
+.finstat__tall-row ~ .finstat__tall-row > div{
     padding-top: 2em;
     padding-bottom: 0.5em;
 }

@@ -4,15 +4,17 @@ from finstat.views import transactions, api
 urlpatterns = patterns(
     '',
     # rest api
-    url(r'^api/transactions$', api.TransactionsList.as_view(), name='transactions_list'),
+    url(r'^api/transactions$', api.TransactionList.as_view(), name='transactions_list'),
+    url(r'^api/transactions/(?P<pk>[0-9]+)$', api.TransactionDetail.as_view(), name='transactions_detail'),
     # url(r'^api/transactions/list/?page=(?P<page>[0-9]+)$', api.TransactionsList.as_view(), name='transactions_list'),
-    url(r'^api/transactions/(?P<pk>[0-9]+)$', api.transactions_item, name='transaction_detail'),
-    url(r'^api/transactions_partial$', api.TransactionsListPartial.as_view(), name='transactions_partial'),
+    # url(r'^api/transactions/(?P<pk>[0-9]+)$', api.transactions_item, name='transaction_detail'),
+    # url(r'^api/transactions_partial$', api.TransactionsListPartial.as_view(), name='transactions_partial'),
     url(r'^api/accounts$', api.AccountList.as_view(), name='accounts_list'),
+    url(r'^api/categories$', api.CategoryList.as_view(), name='accounts_list'),
 
     # pjax supporting templates
     url(r'^transactions$', transactions.base_view, name='finstat-transactions-index'),
-    # url(r'^transactions$', transactions.timeline_pjax_html, {'page': 1}, name='finstat-transactions-index'),
+    url(r'^transactions_tl$', transactions.timeline_pjax_html, {'page': 1}, name='finstat-transactions-index'),
     # url(r'^transactions/page(?P<page>\d+)$', transactions.timeline_pjax_html, name='finstat-list_view'),
     # url(r'^transactions/(?P<interval>((daily)|(monthly)|(annual)))/page(?P<page>\d+)$',
     #     transactions.transactions_stats_view, name='finstat-transactions-overview'),

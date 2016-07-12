@@ -2,10 +2,9 @@ define([], function () {
     return {
         endpoints: {
             accounts: 'api/accounts',
-            transactions: 'api/transactions_partial'
+            transactions: 'api/transactions'
         },
         css: {
-            rowIncome: 'finstat__bar-income', 
             rowOutcome: 'finstat__bar-outcome'
         },
         plugins: {
