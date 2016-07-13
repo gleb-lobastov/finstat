@@ -61,7 +61,7 @@ body {
     width: 90px;
 }
 
-.finstat__add-icon:hover {
+.finstat__add-icon:hover, .finstat__remove-icon:hover {
     color: orange;
 }
 

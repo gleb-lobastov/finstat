@@ -34,7 +34,7 @@ require(["config"], function (document) {
 
          this.$el.find('.ext__editable-for-update').editable({
             ajaxOptions: {
-               type: "PUT",
+               type: "PATCH",
                beforeSend: $.fn.editable.defaults.ajaxOptions.beforeSend
             },
             send: 'always',

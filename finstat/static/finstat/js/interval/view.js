@@ -12,15 +12,19 @@ define([
    var deps;
 
    var Transaction = Backbone.Model.extend({
-      url: 'api/transactions',
-      initialize: function () {
+      initialize: function (attributes, options) {
+         this.alwaysNew = options && options.alwaysNew;
          this.on('change', function () {
-            if (this.income > 0) {
-               this.set('income', +this.get('amount'), {slient: true})
-            } else {
-               this.set('outcome', +this.get('amount'), {slient: true})
-            }
+            console.log('transaction ' + this.cid + ' changed');
+//            if (this.income > 0) {
+//               this.set('income', +this.get('amount'), {slient: true})
+//            } else {
+//               this.set('outcome', +this.get('amount'), {slient: true})
+//            }
          }, this)
+      },
+      isNew: function () {
+         return this.alwaysNew || Backbone.Model.prototype.isNew.call(this);
       },
       defaults: {
          amount: 10,
@@ -31,17 +35,26 @@ define([
    });
 
    var Transactions = Backbone.Collection.extend({
+      url: 'api/transactions',
+      initialize: function () {
+         this.on('change', function () {
+            console.log('transactions ' + this.cid + ' changed');
+         }, this);
+         this.on('add', function () {
+            console.log('transactions ' + this.cid + ' updated');
+         }, this)
+      },
       calcIncome: function () {
          return this.reduce(function (total, currentItem) {
             return total + (
-                  currentItem.get('transaction_type') === single.consts.TT_INCOME ? currentItem.get('amount') : 0
+                  currentItem.get('transaction_type') === single.consts.TT_INCOME ? +currentItem.get('amount') : 0
                );
          }, 0);
       },
       calcOutcome: function () {
          return this.reduce(function (total, currentItem) {
             return total + (
-                  currentItem.get('transaction_type') === single.consts.TT_OUTCOME ? currentItem.get('amount') : 0
+                  currentItem.get('transaction_type') === single.consts.TT_OUTCOME ? +currentItem.get('amount') : 0
                );
          }, 0);
       }
@@ -80,14 +93,16 @@ define([
    });
 
    var TransactionView = Backbone.View.extend({
-      className: "row",
+      className: "row finstat__show-on-hover_area finstat__highlight-row",
       template: _.template(transactionTpl),
       dateSplitterTpl: _.template(headerTpl),
       initialize: function (options) {
          this.model.bind('change', options.header.render, options.header);
+         this.model.bind('sync', options.render, this);
       },
       render: function () {
          var
+            self = this,
             values = this.model.toJSON();
          switch (values.transaction_type) {
             case single.consts.TT_INCOME:
@@ -104,13 +119,21 @@ define([
          values.category = single.categories.getName(values.fk_category);
          this.$el.html(this.template(values));
          deps.turnEditable.call(this);
+         this.$('.finstat__remove-icon').click(function () {
+            self.model.destroy();
+            self.remove();
+         });
          return this;
       }
    });
 
    var TransactionsView = Backbone.View.extend({
       initialize: function (options) {
+         var self = this;
          this.header = options.header;
+         this.collection.on('add', function (model, collection) {
+            self.createElement.call(self, model)
+         });
       },
       render: function () {
          this.collection.each(function (transaction) {
@@ -121,11 +144,18 @@ define([
             this.$el.append(transactionView.render().el);
          }, this);
          return this;
+      },
+      createElement: function (transaction) {
+         var transactionView = new TransactionView({
+            model: transaction,
+            header: this.header
+         });
+         this.$el.append(transactionView.render().el);
       }
    });
 
    var IntervalHeaderView = Backbone.View.extend({
-      className: "row finstat__tall-row",
+      className: "row finstat__tall-row finstat__highlight-row",
       template: _.template(headerTpl),
       render: function () {
          var
@@ -148,8 +178,8 @@ define([
       template: _.template(formTpl),
       initialize: function () {
          this.$el.attr({
-            action: "/finstat/api/transactions/list",
-            method: "post"
+//            action: "/finstat/api/transactions/list",
+//            method: "post"
          })
       },
       render: function () {
@@ -158,9 +188,18 @@ define([
             amount: 100,
             date: (new Date()).toISOString().substring(0, 10)
          })).find('.finstat__submit-icon').click(function () {
+            self.model.set(self.getFormData());
             self.model.save();
          });
          return this;
+      },
+      getFormData: function () {
+         return $('#finstat__form-edit-transaction').serializeArray().reduce(
+            function (attributes, item) {
+               attributes[item.name] = item.value;
+               return attributes;
+            }, {}
+         );
       }
    });
 
@@ -192,8 +231,9 @@ define([
          this.$el.html(this.addRowTemplate()).find('.finstat__add-icon').click(function () {
             $(this).hide();
             var form = new TransactionFormView({
-               model: new Transaction()
+               model: new Transaction({}, {alwaysNew: true})
             }).render();
+            form.model.on('sync', intervalsView.insertNewItem, intervalsView);
             intervalsView.$el.prepend(form.el);
          });
          this.collection.each(function (interval) {
@@ -207,6 +247,19 @@ define([
          }, this);
          this.trigger('rendered');
          return this;
+      },
+      insertNewItem: function (transactionModel) {
+         var transactionsCollection = this.getByDate(transactionModel.get('date'));
+         if (transactionsCollection) {
+            console.log('beforeAdd');
+            transactionsCollection.get('transactions').add(transactionModel.clone());
+            console.log('afterAdd');
+         }
+      },
+      getByDate: function (date) {
+         return this.collection.find(function (interval) {
+            return interval.get('date') === date;
+         })
       }
    });
    return {
