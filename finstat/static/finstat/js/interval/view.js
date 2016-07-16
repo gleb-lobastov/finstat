@@ -5,10 +5,10 @@ define([
    'finstat/single/collections',
    'text!finstat/interval/transaction.html',
    'text!finstat/interval/header.html',
-   'text!finstat/interval/addRow.html',
    'text!finstat/interval/form.html',
-   'finstat/defaults'
-], function (Backbone, _, moment, single, transactionTpl, headerTpl, addRow, formTpl, finstatDefaults) {
+   'locale/ru'
+], function (Backbone, _, moment, single, transactionTpl, headerTpl, formTpl) {
+   moment.locale('ru');
    var deps;
 
    var Transaction = Backbone.Model.extend({
@@ -73,8 +73,8 @@ define([
 
    var Transactions = Backbone.Collection.extend({
       url: 'api/transactions',
-      comparator: function (collection) {
-         return -collection.get('id');
+      comparator: function (model) {
+         return -model.get('id');
       },
       initialize: function () {
       },
@@ -136,13 +136,12 @@ define([
    });
 
    var TransactionFormView = Backbone.View.extend({
-      className: "form-inline",
+      className: "row",
       events: {
+         'click .finstat__add-icon': 'toggleForm',
          'click .finstat__submit-icon': 'submit'
       },
-      id: 'finstat__form-edit-transaction',
       model: Transaction,
-      tagName: 'form',
       template: _.template(formTpl),
       initialize: function () {
       },
@@ -151,6 +150,7 @@ define([
             amount: 100,
             date: (new Date()).toISOString().substring(0, 10)
          }));
+         this.toggleForm(false);
          return this;
       },
       collectFormData: function () {
@@ -163,6 +163,10 @@ define([
       },
       submit: function () {
          this.model.create(this.collectFormData());
+      },
+      toggleForm: function (value) {
+         this.$('.finstat__add-icon').toggle(!value);
+         this.$('#finstat__form-edit-transaction').toggle(value);
       }
    });
 
@@ -177,28 +181,34 @@ define([
       initialize: function () {
          this.set('income', this.get('transactions').calcIncome());
          this.set('outcome', this.get('transactions').calcOutcome());
-         this.listenTo(this.get('transactions'), 'change:amount', this.recalculate)
-         this.listenTo(this.get('transactions'), 'remove', this.subtract)
+         this.listenTo(this.get('transactions'), 'change:amount', this.delta);
+         this.listenTo(this.get('transactions'), 'add', this.append);
+         this.listenTo(this.get('transactions'), 'remove', this.subtract);
       },
-      recalculate: function (transactionModel) {
-         var affectedParam = transactionModel.cases('income', 'outcome');
+      recalculate: function (transaction, delta) {
+         var affectedParam = transaction.cases('income', 'outcome');
          if (affectedParam) {
-            this.set(affectedParam, this.get(affectedParam) + transactionModel.delta());
+            this.set(affectedParam, this.get(affectedParam) + delta);
          }
          this.trigger('recalculated:amount');
       },
-      subtract: function (transactionModel) {
-         var affectedParam = transactionModel.cases('income', 'outcome');
-         if (affectedParam) {
-            this.set(affectedParam, this.get(affectedParam) - transactionModel.get('amount'));
-         }
-         this.trigger('recalculated:amount');
+      delta: function (transaction) {
+         this.recalculate(transaction, transaction.delta());
+      },
+      append: function (transaction) {
+         this.recalculate(transaction, +transaction.get('amount'));
+      },
+      subtract: function (transaction) {
+         this.recalculate(transaction, -transaction.get('amount'));
       }
    });
 
    var Intervals = Backbone.Collection.extend({
       model: Interval,
       url: 'api/transactions',
+      comparator: function (model) {
+         return -model.get('date');
+      },
       parse: function (response) {
          var dates = [],
             currentDate = null,
@@ -210,7 +220,7 @@ define([
             if (currentDate != thisTransaction.date) {
                if (currentDate) {
                   dates.push({
-                     date: currentDate,
+                     date: moment(currentDate),
                      transactions: new Transactions(currentTransactions)
                   });
                }
@@ -220,6 +230,47 @@ define([
             currentTransactions.push(new Transaction(thisTransaction));
          }
          return dates;
+      },
+      includeNewTransaction: function (transaction) {
+         var
+            date = moment(transaction.get('date')),
+            transactions = this.getByDate(date);
+
+         transaction.set(
+            'transaction_type',
+            single.accounts.getOperationType(
+               transaction.get('fk_account_from'),
+               transaction.get('fk_account_to')
+            ));
+
+         if (!transactions && this.isDateInDisplayedInterval(date)) {
+            transactions = new Transactions([
+               new Transaction(transaction)
+            ]);
+            this.collection.add(new Interval({
+               date: date,
+               transactions: transactions
+            }))
+         }
+         if (transactions) {
+            transactions.get('transactions').add(transaction.clone());
+         }
+      },
+      getByDate: function (date) {
+         return this.find(function (interval) {
+            return interval.get('date').isSame(date, 'day');
+         })
+      },
+      isDateInDisplayedInterval: function (date) {
+         function getDate(model) {
+            return model.get('date');
+         }
+
+         var page = 1;
+         return (
+            date >= getDate(this.min(getDate)) ||
+            page >= 1 && date <= getDate(this.max(getDate))
+         );
       }
    });
 
@@ -231,7 +282,7 @@ define([
          this.listenTo(this.model, 'recalculated:amount', this.updateStats);
       },
       render: function () {
-         this.$el.html(this.template({date: this.model.get('date')}));
+         this.$el.html(this.template({date: this.model.get('date').format('DD MMMM YYYY')}));
          this.updateStats();
          return this;
       },
@@ -241,11 +292,20 @@ define([
       }
    });
 
+   var IntervalView = Backbone.View.extend({
+      render: function () {
+         var intervalHeaderView = new IntervalHeaderView({model: this.model});
+         var transactionsView = new TransactionsView({
+            collection: this.model.get('transactions')
+         });
+         this.$el.append(intervalHeaderView.render().el);
+         this.$el.append(transactionsView.render().el);
+         return this;
+      }
+   });
+
    var IntervalsView = Backbone.View.extend({
-      events: {
-         'click .finstat__add-icon': 'showForm'
-      },
-      template: _.template(addRow),
+      formTemplate: _.template(formTpl),
       url: 'api/transactions',
       initialize: function () {
          var self = this;
@@ -266,47 +326,22 @@ define([
                });
             }
          });
+         this.listenTo(this.collection, 'add', this.appendInterval)
       },
       render: function () {
-         this.$el.html(this.template());
-         this.collection.each(function (interval) {
-            var intervalHeaderView = new IntervalHeaderView({model: interval});
-            var transactionsView = new TransactionsView({
-               collection: interval.get('transactions')
-            });
-            this.$el.append(intervalHeaderView.render().el);
-            this.$el.append(transactionsView.render().el);
-         }, this);
+         var form = new TransactionFormView({
+            model: new Transaction({}, {alwaysNew: true}) // to TransactionFormView
+         });
+         this.$el.prepend(form.render().$el);
+         this.collection.listenTo(form.model, 'sync', this.collection.includeNewTransaction);
          this.trigger('rendered');
          return this;
       },
-      showForm: function () {
-         this.$('.finstat__add-icon').hide();
-         var form = new TransactionFormView({
-            model: new Transaction({}, {alwaysNew: true})
-         }).render();
-         this.listenTo(form.model, 'sync', this.insertNewItem);
-         this.$el.prepend(form.el);
-      },
-      insertNewItem: function (transactionFormModel) {
-         var transactionsCollection = this.getByDate(transactionFormModel.get('date'));
-         transactionFormModel.set(
-            'transaction_type',
-            single.accounts.getOperationType(
-               transactionFormModel.get('fk_account_from'),
-               transactionFormModel.get('fk_account_to')
-            ));
-
-         if (transactionsCollection) {
-            transactionsCollection.get('transactions').add(transactionFormModel.clone());
-         }
-      },
-      getByDate: function (date) {
-         return this.collection.find(function (interval) {
-            return interval.get('date') === date;
-         })
+      appendInterval: function (intervalModel) {
+         this.$el.append(new IntervalView({model: intervalModel}).render().$el);
       }
    });
+
    return {
       init: function (dependencies) {
          deps = dependencies;

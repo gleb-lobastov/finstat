@@ -52,7 +52,7 @@ body {
     background-color: lightyellow;
 }
 
-.finstat__tall-row ~ .finstat__tall-row > div{
+.finstat__tall-row /*~ .finstat__tall-row */> div{
     padding-top: 2em;
     padding-bottom: 0.5em;
 }
@@ -61,7 +61,7 @@ body {
     width: 90px;
 }
 
-.finstat__add-icon:hover, .finstat__remove-icon:hover {
+.finstat__add-icon:hover, .finstat__remove-icon:hover, .finstat__submit-icon:hover {
     color: orange;
 }
 
