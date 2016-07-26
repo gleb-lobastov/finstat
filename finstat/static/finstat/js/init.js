@@ -6,33 +6,23 @@ require(["config"], function (document) {
       "jquery",
       "finstat/helpers",
       "finstat/interval/view",
-//      "finstat/accounts/collection",
       "bootstrap",
       "bootstrap-editable"
-   ], function ($, helpers, intervals) {
-
-      intervals.init({
-         turnEditable: turnEditable
-      });
-      var intervalsView = new intervals.IntervalsView();
-      intervalsView.on('rendered', function () {
-         var self = this;
-         $(document).ready(function () {
-            $('#finstat__transactions-content').append(self.$el);
-         });
+   ], function ($, helpers,transactionsListUnit) {
+      $.fn.editable.defaults.ajaxOptions = {
+         beforeSend: function (xhr) {xhr.setRequestHeader("X-CSRFToken", helpers.getCookie('csrftoken'))}
+      };
+      
+      transactionsListUnit.init({turnEditable: turnEditable});
+      var transactionsListView = new transactionsListUnit.View();
+      $(document).ready(function () {
+         $('#finstat__transactions-content').append(transactionsListView.render().$el);
       });
 
       function turnEditable() {
          var self = this;
-         $.fn.editable.defaults.ajaxOptions = {
-            beforeSend: function (xhr) {
-               xhr.setRequestHeader("X-CSRFToken", helpers.getCookie('csrftoken'));
-            }
-         };
-
-         this.$el.find('.ext__editable-for-insert').editable();
-
-         this.$el.find('.ext__editable-for-update').editable({
+         this.$('.ext__editable-for-insert').editable();
+         this.$('.ext__editable-for-update').editable({
             ajaxOptions: {
                type: "PATCH",
                beforeSend: $.fn.editable.defaults.ajaxOptions.beforeSend

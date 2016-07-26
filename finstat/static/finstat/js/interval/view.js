@@ -9,7 +9,9 @@ define([
    'locale/ru'
 ], function (Backbone, _, moment, single, transactionTpl, headerTpl, formTpl) {
    moment.locale('ru');
-   var deps;
+   var
+      deps,
+      details = $.when(single.acccounts, single.categories);
 
    var Transaction = Backbone.Model.extend({
       _alwaysNew: false,
@@ -30,7 +32,7 @@ define([
          this.set(data);
          this.save();
       },
-      resolveAttributes: function () {
+      resolveAttributes: function () { // to view and presenter
          var
             values = this.toJSON(),
             resolved = {};
@@ -77,6 +79,12 @@ define([
          return -model.get('id');
       },
       initialize: function () {
+         this.listenTo(this, 'remove', this.checkEmptiness);
+      },
+      checkEmptiness: function () {
+         if (!this.length) {
+            this.trigger('empty');
+         }
       },
       calcAmount: function (transaction_type) {
          return this.reduce(function (total, currentItem) {
@@ -137,12 +145,13 @@ define([
 
    var TransactionFormView = Backbone.View.extend({
       className: "row",
+      // collection: Intervals
       events: {
          'click .finstat__add-icon': 'toggleForm',
          'click .finstat__submit-icon': 'submit'
       },
-      model: Transaction,
       template: _.template(formTpl),
+      expanded: false,
       initialize: function () {
       },
       render: function () {
@@ -150,23 +159,27 @@ define([
             amount: 100,
             date: (new Date()).toISOString().substring(0, 10)
          }));
-         this.toggleForm(false);
+         this.toggleForm(this.expanded);
+//         this.delegateEvents(this.events());
          return this;
       },
+      toggleForm: function (value) {
+         this.expanded = value;
+         this.$('.finstat__add-icon').toggle(!value);
+         this.$('#finstat__form-edit-transaction').toggle(value);
+      },
+      submit: function () {
+         var transaction = new Transaction(this.collectFormData());
+         this.collection.appendTransaction(transaction);
+         transaction.save();
+      },
       collectFormData: function () {
-         return $('#finstat__form-edit-transaction').serializeArray().reduce(
+         return this.$('#finstat__form-edit-transaction').serializeArray().reduce(
             function (attributes, item) {
                attributes[item.name] = item.value;
                return attributes;
             }, {}
          );
-      },
-      submit: function () {
-         this.model.create(this.collectFormData());
-      },
-      toggleForm: function (value) {
-         this.$('.finstat__add-icon').toggle(!value);
-         this.$('#finstat__form-edit-transaction').toggle(value);
       }
    });
 
@@ -184,6 +197,7 @@ define([
          this.listenTo(this.get('transactions'), 'change:amount', this.delta);
          this.listenTo(this.get('transactions'), 'add', this.append);
          this.listenTo(this.get('transactions'), 'remove', this.subtract);
+         this.listenTo(this.get('transactions'), 'empty', this.destroy);
       },
       recalculate: function (transaction, delta) {
          var affectedParam = transaction.cases('income', 'outcome');
@@ -206,6 +220,8 @@ define([
    var Intervals = Backbone.Collection.extend({
       model: Interval,
       url: 'api/transactions',
+      initialize: function () {
+      },
       comparator: function (model) {
          return -model.get('date');
       },
@@ -231,29 +247,26 @@ define([
          }
          return dates;
       },
-      includeNewTransaction: function (transaction) {
+      appendTransaction: function (transaction) {
          var
             date = moment(transaction.get('date')),
-            transactions = this.getByDate(date);
+            interval = this.getByDate(date);
 
-         transaction.set(
-            'transaction_type',
-            single.accounts.getOperationType(
-               transaction.get('fk_account_from'),
-               transaction.get('fk_account_to')
-            ));
-
-         if (!transactions && this.isDateInDisplayedInterval(date)) {
-            transactions = new Transactions([
-               new Transaction(transaction)
-            ]);
-            this.collection.add(new Interval({
+         if (!interval && this.isDateInDisplayedInterval(date)) {
+            interval = new Interval({
                date: date,
-               transactions: transactions
-            }))
+               transactions: new Transactions([])
+            });
+            this.add(interval, {consecutive: false});
          }
-         if (transactions) {
-            transactions.get('transactions').add(transaction.clone());
+         if (interval) {
+            transaction.set(
+               'transaction_type',
+               single.accounts.getOperationType(
+                  transaction.get('fk_account_from'),
+                  transaction.get('fk_account_to')
+               ));
+            interval.get('transactions').add(transaction);
          }
       },
       getByDate: function (date) {
@@ -287,8 +300,12 @@ define([
          return this;
       },
       updateStats: function () {
-         this.$('.finstat__bar-income').text(this.model.get('income'));
-         this.$('.finstat__bar-outcome').text(this.model.get('outcome'));
+         var
+            income = this.model.get('income'),
+            outcome = this.model.get('outcome');
+         this.$('.finstat__bar-income').toggle(!!income).text(income);
+         this.$('.finstat__bar-outcome').toggle(!!outcome).text(outcome);
+         this.$('.finstat__bar-no_changes').toggle(!income && !outcome);
       }
    });
 
@@ -308,37 +325,36 @@ define([
       formTemplate: _.template(formTpl),
       url: 'api/transactions',
       initialize: function () {
-         var self = this;
-         if (!this.collection) {
-            this.collection = new Intervals();
-         }
-         this.collection.fetch({
-            success: function () {
-               var
-                  waitFor = [single.accounts, single.categories],
-                  renderAfterFetch = _.after(waitFor.length, self.render.bind(self));
-               _.each(waitFor, function (collection) {
-                  if (collection.fetched) {
-                     renderAfterFetch();
-                  } else {
-                     self.listenToOnce(collection, 'sync', renderAfterFetch);
-                  }
-               });
-            }
+         this.listenTo(this.collection, 'reset update', function () {
+            $.when(
+               single.accounts.fetched,
+               single.categories.fetched
+            ).then(this.render.bind(this))
          });
-         this.listenTo(this.collection, 'add', this.appendInterval)
+         this.collection.fetch();
       },
       render: function () {
-         var form = new TransactionFormView({
-            model: new Transaction({}, {alwaysNew: true}) // to TransactionFormView
-         });
-         this.$el.prepend(form.render().$el);
-         this.collection.listenTo(form.model, 'sync', this.collection.includeNewTransaction);
-         this.trigger('rendered');
+         this.$el.empty();
+         this.collection.each(function (model) {
+            var intervalView = new IntervalView({model: model});
+            this.$el.append(intervalView.render().$el);
+         }, this);
          return this;
+      }
+   });
+
+   /* Список транзакций. Состоит из формы добавления транзакции и списка интервалов */
+   var TransactionsListView = Backbone.View.extend({
+      initialize: function () {
+         var intervals = new Intervals();
+         this.intervalsView = new IntervalsView({collection: intervals});
+         this.form = new TransactionFormView({collection: intervals});
       },
-      appendInterval: function (intervalModel) {
-         this.$el.append(new IntervalView({model: intervalModel}).render().$el);
+      render: function () {
+         this.$el.empty().
+            append(this.form.render().$el).
+            append(this.intervalsView.$el); // рендер по событию
+         return this;
       }
    });
 
@@ -346,6 +362,6 @@ define([
       init: function (dependencies) {
          deps = dependencies;
       },
-      IntervalsView: IntervalsView
+      View: TransactionsListView
    };
 });

@@ -1,4 +1,4 @@
-define(['backbone', 'finstat/defaults'], function (Backbone, defs) {
+define(['backbone'], function (Backbone) {
    // singleton
    var consts = {
       TT_INCOME: 1,
@@ -9,22 +9,19 @@ define(['backbone', 'finstat/defaults'], function (Backbone, defs) {
    };
 
    var Accounts = Backbone.Model.extend({});
+   
+   var PromisedCollection = Backbone.Collection.extend({
+      initialize: function () {
+         this.fetched = this.fetch()
+      }
+   });
 
-   var AccountsCollection = Backbone.Collection.extend({
+   var AccountsCollection = PromisedCollection.extend({
       url: 'api/accounts',
       model: Accounts,
       parse: function (response) {
          return response.results;
       },
-      initialize: function () {
-         var self = this;
-         self.fetch({
-            success: function () {
-               self.fetched = true
-            }
-         });
-      },
-
       getName: function (id) {
          var model = this.get(id);
          return model ? model.get('account_name') : undefined;
@@ -50,21 +47,12 @@ define(['backbone', 'finstat/defaults'], function (Backbone, defs) {
 
    var Categories = Backbone.Model.extend({});
 
-   var CategoriesCollection = Backbone.Collection.extend({
+   var CategoriesCollection = PromisedCollection.extend({
       url: 'api/categories',
       model: Categories,
       parse: function (response) {
          return response.results;
       },
-      initialize: function () {
-         var self = this;
-         self.fetch({
-            success: function () {
-               self.fetched = true
-            }
-         });
-      },
-
       getName: function (id) {
          var model = this.get(id);
          return model ? model.get('category_name') : undefined;
