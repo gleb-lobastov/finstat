@@ -13,18 +13,64 @@ define([
       deps,
       details = $.when(single.acccounts, single.categories);
 
+   // Models
+
    var Transaction = Backbone.Model.extend({
-      _alwaysNew: false,
+      schema: {
+         "$schema": "http://json-schema.org/draft-04/schema#",
+         "type": "object",
+         "title": "Transaction model.",
+         "description": "Транзакция описывает один акт перевода денег между счетами.",
+         "properties": {
+            "amount": {
+               "type": "integer",
+               "minimum": 0,
+               "title": "Сумма перевода."
+            },
+            "date": {
+               "type": "string",
+               "format": "date-time",
+               "title": "Дата исполнения транзакции."
+            },
+            "account_from": {
+               "type": "integer",
+               "multipleOf": 1,
+               "minimum": 0,
+               "title": "Идентификатор счета списания.",
+               "description": "Счет с которого деньги были списаны."
+            },
+            "account_to": {
+               "type": "integer",
+               "multipleOf": 1,
+               "minimum": 0,
+               "title": "Идентификатор счета зачисления.",
+               "description": "Счет на которы были зачисленны деньги."
+            }
+         },
+         "required": [
+            "amount",
+            "date"
+         ]
+      },
       defaults: {
-         amount: 10,
-         date: new Date().toISOString().substr(0, 10),
-         account_from: null,
-         account_to: null
+         date: moment().format('YYYY-MM-DD'),
+         amount: 0
       },
       urlRoot: 'api/transactions',
+
+      _alwaysNew: false,
+
       initialize: function (attributes, options) {
          this._alwaysNew = options && options.alwaysNew;
       },
+
+      /**
+       * Для модейлей с опцией alwaysNew обеспечивает принудительное
+       * создание новой записи на сервере при сохранении модели.
+       *
+       * @override
+       * @returns {boolean} Флаг "создавать ли новую запись"
+       */
       isNew: function () {
          return this._alwaysNew || Backbone.Model.prototype.isNew.call(this);
       },
@@ -100,6 +146,150 @@ define([
       }
    });
 
+   var Interval = Backbone.Model.extend({
+      schema: {
+         "$schema": "http://json-schema.org/draft-04/schema#",
+         "type": "object",
+         "title": "Модель интервала транзакций.",
+         "description": "В интервале храниться одна и более транзакций. " +
+         "Интервал объединяет транзакции относящиеся к одному промежутку времени (по датам).",
+         "properties": {
+            "dateMoment": {
+               "type": "object",
+               "title": "Дата начала интервала (объект moment).",
+               "description": "Транзакции в интервале должны быть между датой начала и окончания (включительно).",
+               "properties": {}
+            },
+            "endDateMoment": {
+               "type": "object",
+               "title": "Дата окончания интервала (объект moment.",
+               "description": "Если не указана, то принимается равной дате начала. " +
+                  "Ответственность за неперекрытие интервалов лежит на сервере",
+               "properties": {}
+            },
+            "transactions": {
+               "type": "object",
+               "title": "Backbone коллекция транзакций.",
+               "description": "Коллекция соответствующая модели Transaction.",
+               "properties": {}
+            }
+         },
+         "required": [
+            "dateMoment",
+            "transactions"
+         ]
+      },
+      initialize: function () {
+         this.set('income', this.get('transactions').calcIncome());
+         this.set('outcome', this.get('transactions').calcOutcome());
+         this.listenTo(this.get('transactions'), 'change:amount', this.delta);
+         this.listenTo(this.get('transactions'), 'add', this.append);
+         this.listenTo(this.get('transactions'), 'remove', this.subtract);
+         this.listenTo(this.get('transactions'), 'empty', this.destroy);
+      },
+      recalculate: function (transaction, delta) {
+         var affectedParam = transaction.cases('income', 'outcome');
+         if (affectedParam) {
+            this.set(affectedParam, this.get(affectedParam) + delta);
+         }
+         this.trigger('recalculated:amount');
+      },
+      delta: function (transaction) {
+         this.recalculate(transaction, transaction.delta());
+      },
+      append: function (transaction) {
+         this.recalculate(transaction, +transaction.get('amount'));
+      },
+      subtract: function (transaction) {
+         this.recalculate(transaction, -transaction.get('amount'));
+      }
+   });
+
+   var Intervals = Backbone.Collection.extend({
+      model: Interval,
+      url: 'api/transactions',
+      initialize: function () {
+      },
+      comparator: function (model) {
+         return -model.get('dateMoment');
+      },
+
+      /**
+       * Преобразует ответ сервера к формута понятному Backbone
+       *
+       * @param response ответ сервера
+       * @returns {Array} массив интервалов
+       */
+      parse: function (response) {
+         var dates = [],
+            dateStrSQL = null,
+            transactionsOfInterval = [],
+            transactionData;
+
+         for (var i = 0; i < response.results.length; i++) {
+            transactionData = response.results[i];
+            if (dateStrSQL != transactionData.date) {
+
+               // Новая коллекция транзакций создается при смене дат.
+               // Подразумевается что список отсортирован по дате.
+               if (dateStrSQL) {
+                  dates.push({
+                     dateMoment: moment(dateStrSQL),
+                     transactions: new Transactions(transactionsOfInterval)
+                  });
+               }
+               dateStrSQL = transactionData.date;
+               transactionsOfInterval = [];
+            }
+            transactionsOfInterval.push(new Transaction(transactionData));
+         }
+         return dates;
+      },
+      appendTransaction: function (transaction) {
+         var
+            dateMoment = moment(transaction.get('date')),
+            interval = this.getByDate(dateMoment);
+
+         if (!interval && this.isDateInDisplayedInterval(dateMoment)) {
+            interval = new Interval({
+               dateMoment: dateMoment,
+               transactions: new Transactions([])
+            });
+            this.add(interval);
+         }
+         if (interval) {
+
+            // Выставляем тип новой транзакции (доход/расход)
+            transaction.set(
+               'transaction_type',
+               single.accounts.getOperationType(
+                  transaction.get('fk_account_from'),
+                  transaction.get('fk_account_to')
+               ));
+            interval.get('transactions').add(transaction);
+         }
+      },
+      getByDate: function (dateMoment) {
+         return this.find(function (interval) {
+            return interval.get('dateMoment').isSame(dateMoment, 'day');
+         })
+      },
+      isDateInDisplayedInterval: function (dateMoment) {
+         function getDate(model) {
+            return model.get('dateMoment');
+         }
+
+         // todo учитывать пагинацию
+         var page = 1;
+         return (
+            dateMoment >= getDate(this.min(getDate)) ||
+            page >= 1 && dateMoment <= getDate(this.max(getDate))
+         );
+      }
+   });
+
+   // Views
+
    var TransactionView = Backbone.View.extend({
       className: "row finstat__show-on-hover_area finstat__highlight-row",
       events: {
@@ -145,23 +335,54 @@ define([
 
    var TransactionFormView = Backbone.View.extend({
       className: "row",
-      // collection: Intervals
       events: {
          'click .finstat__add-icon': 'toggleForm',
-         'click .finstat__submit-icon': 'submit'
+         'click .finstat__submit-icon': 'submit',
+         'change input': 'onUserChange'
       },
-      template: _.template(formTpl),
       expanded: false,
+      template: _.template(formTpl),
+      model: new Transaction(null, {alwaysNew: true}),
       initialize: function () {
+         var self = this;
+         var $deferred = new $.Deferred();
+         this.listenTo(this, 'rendered', $deferred.resolve);
+         this.listenTo(this.model, 'change', this.onChange)
+         this.waitDatepicker = $deferred.then(function () {
+            return deps.turnDatePicker.call(this, {
+               onSelect: function (formattedDate) {
+                  self.model.set({'date': formattedDate}, {silent: true});
+               }
+            });
+         });
+//         this.waitDatepicker.then(function (datepicker) {
+//            datepicker.onSelect()
+//         });
       },
       render: function () {
-         this.$el.html(this.template({
-            amount: 100,
-            date: (new Date()).toISOString().substring(0, 10)
-         }));
+         this.$el.html(this.template(this.model.toJSON()));
          this.toggleForm(this.expanded);
-//         this.delegateEvents(this.events());
+         this.trigger('rendered');
          return this;
+      },
+      onUserChange: function (jqEvent) {
+         console.dir({func: arguments.callee.name, args: arguments, ctx: this});
+         var
+            $input = $(jqEvent.target),
+            updated = {};
+         updated[$input.attr('name')] = $input.val();
+         this.model.set(updated, {silent: true});
+      },
+      onChange: function (model, options) {
+         console.dir({func: arguments.callee.name, args: arguments, ctx: this});
+         var
+            self = this,
+            changes = this.model.changedAttributes();
+         if (changes && 'date' in changes) {
+            this.waitDatepicker.then(function (datepicker) {
+               datepicker.selectDate(moment(self.model.get('date')).toDate());
+            })
+         }
       },
       toggleForm: function (value) {
          this.expanded = value;
@@ -169,121 +390,9 @@ define([
          this.$('#finstat__form-edit-transaction').toggle(value);
       },
       submit: function () {
-         var transaction = new Transaction(this.collectFormData());
-         this.collection.appendTransaction(transaction);
-         transaction.save();
-      },
-      collectFormData: function () {
-         return this.$('#finstat__form-edit-transaction').serializeArray().reduce(
-            function (attributes, item) {
-               attributes[item.name] = item.value;
-               return attributes;
-            }, {}
-         );
-      }
-   });
-
-
-   var Interval = Backbone.Model.extend({
-      defaults: {
-         income: 0,
-         outcome: 0,
-         date: null,
-         transactions: undefined
-      },
-      initialize: function () {
-         this.set('income', this.get('transactions').calcIncome());
-         this.set('outcome', this.get('transactions').calcOutcome());
-         this.listenTo(this.get('transactions'), 'change:amount', this.delta);
-         this.listenTo(this.get('transactions'), 'add', this.append);
-         this.listenTo(this.get('transactions'), 'remove', this.subtract);
-         this.listenTo(this.get('transactions'), 'empty', this.destroy);
-      },
-      recalculate: function (transaction, delta) {
-         var affectedParam = transaction.cases('income', 'outcome');
-         if (affectedParam) {
-            this.set(affectedParam, this.get(affectedParam) + delta);
-         }
-         this.trigger('recalculated:amount');
-      },
-      delta: function (transaction) {
-         this.recalculate(transaction, transaction.delta());
-      },
-      append: function (transaction) {
-         this.recalculate(transaction, +transaction.get('amount'));
-      },
-      subtract: function (transaction) {
-         this.recalculate(transaction, -transaction.get('amount'));
-      }
-   });
-
-   var Intervals = Backbone.Collection.extend({
-      model: Interval,
-      url: 'api/transactions',
-      initialize: function () {
-      },
-      comparator: function (model) {
-         return -model.get('date');
-      },
-      parse: function (response) {
-         var dates = [],
-            currentDate = null,
-            currentTransactions = [],
-            thisTransaction;
-
-         for (var i = 0; i < response.results.length; i++) {
-            thisTransaction = response.results[i];
-            if (currentDate != thisTransaction.date) {
-               if (currentDate) {
-                  dates.push({
-                     date: moment(currentDate),
-                     transactions: new Transactions(currentTransactions)
-                  });
-               }
-               currentDate = thisTransaction.date;
-               currentTransactions = [];
-            }
-            currentTransactions.push(new Transaction(thisTransaction));
-         }
-         return dates;
-      },
-      appendTransaction: function (transaction) {
-         var
-            date = moment(transaction.get('date')),
-            interval = this.getByDate(date);
-
-         if (!interval && this.isDateInDisplayedInterval(date)) {
-            interval = new Interval({
-               date: date,
-               transactions: new Transactions([])
-            });
-            this.add(interval, {consecutive: false});
-         }
-         if (interval) {
-            transaction.set(
-               'transaction_type',
-               single.accounts.getOperationType(
-                  transaction.get('fk_account_from'),
-                  transaction.get('fk_account_to')
-               ));
-            interval.get('transactions').add(transaction);
-         }
-      },
-      getByDate: function (date) {
-         return this.find(function (interval) {
-            return interval.get('date').isSame(date, 'day');
-         })
-      },
-      isDateInDisplayedInterval: function (date) {
-         function getDate(model) {
-            return model.get('date');
-         }
-
-         var page = 1;
-         return (
-            date >= getDate(this.min(getDate)) ||
-            page >= 1 && date <= getDate(this.max(getDate))
-         );
+         var newTransaction = this.model.clone();
+         this.collection.appendTransaction(newTransaction);
+         newTransaction.save();
       }
    });
 
@@ -295,7 +404,7 @@ define([
          this.listenTo(this.model, 'recalculated:amount', this.updateStats);
       },
       render: function () {
-         this.$el.html(this.template({date: this.model.get('date').format('DD MMMM YYYY')}));
+         this.$el.html(this.template({dateStr: this.model.get('dateMoment').format('DD MMMM YYYY')}));
          this.updateStats();
          return this;
       },
@@ -310,6 +419,9 @@ define([
    });
 
    var IntervalView = Backbone.View.extend({
+      events: {
+         'click .finstat__interval-date': 'clickOnDate'
+      },
       render: function () {
          var intervalHeaderView = new IntervalHeaderView({model: this.model});
          var transactionsView = new TransactionsView({
@@ -318,6 +430,9 @@ define([
          this.$el.append(intervalHeaderView.render().el);
          this.$el.append(transactionsView.render().el);
          return this;
+      },
+      clickOnDate: function () {
+         this.$el.trigger('clicked:date', this);
       }
    });
 
@@ -345,15 +460,18 @@ define([
 
    /* Список транзакций. Состоит из формы добавления транзакции и списка интервалов */
    var TransactionsListView = Backbone.View.extend({
+      events: {
+         'clicked:date': function (jqEvent, intervalHeader) {
+            this.form.model.set('date', intervalHeader.model.get('dateMoment').format("YYYY-MM-DD"));
+         }
+      },
       initialize: function () {
          var intervals = new Intervals();
          this.intervalsView = new IntervalsView({collection: intervals});
          this.form = new TransactionFormView({collection: intervals});
       },
       render: function () {
-         this.$el.empty().
-            append(this.form.render().$el).
-            append(this.intervalsView.$el); // рендер по событию
+         this.$el.empty().append(this.form.render().$el).append(this.intervalsView.$el); // рендер по событию
          return this;
       }
    });

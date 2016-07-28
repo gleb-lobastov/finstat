@@ -12,8 +12,11 @@ require(["config"], function (document) {
       $.fn.editable.defaults.ajaxOptions = {
          beforeSend: function (xhr) {xhr.setRequestHeader("X-CSRFToken", helpers.getCookie('csrftoken'))}
       };
-      
-      transactionsListUnit.init({turnEditable: turnEditable});
+
+      transactionsListUnit.init({
+         turnEditable: turnEditable,
+         turnDatePicker: turnDatePicker
+      });
       var transactionsListView = new transactionsListUnit.View();
       $(document).ready(function () {
          $('#finstat__transactions-content').append(transactionsListView.render().$el);
@@ -38,6 +41,23 @@ require(["config"], function (document) {
                self.model.set('amount', newValue); //update backbone model
             }
          });
+      }
+
+      function turnDatePicker(options) {
+         var $deferred = new $.Deferred();
+         require(["datepicker"], function () {
+            var datepicker =
+               this.$('.ext__air-datepicker').
+                  datepicker(
+                     _.extend(options, {
+                        'class': "datepicker-here",
+                        'dateFormat': 'yyyy-mm-dd'
+                     })
+                  ).
+                  data('datepicker');
+            $deferred.resolve(datepicker);
+         });
+         return $deferred.promise();
       }
    });
 });
@@ -90,12 +110,7 @@ require(["config"], function (document) {
 //                }
 //            });
 //
-//            require(["datepicker"], function () {
-//                 $('.ext__air-datepicker').datepicker({
-//                    'class': "datepicker-here",
-//                    'dateFormat': 'yyyy-mm-dd'
-//                });
-//            });
+
 
 
 //            require(["jquery.pjax"], function () {
