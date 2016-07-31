@@ -1,21 +1,40 @@
+/*
+static
+   lib
+      jquery  // lib/jquery
+      bootstrap
+   app_name
+      style
+         format
+      adapters
+         selectable
+      components
+         transactions
+            list
+      main.js
+      config.js
+
+ */
 // Точка входа приложения finstat
 require(["config"], function (document) {
    // Чтобы резолвить зависимости сначала подгружаем конфиг requirejs.
    // Для корректной работы angular нужно что-бы DOM был уже загружен
    require([
       "jquery",
+      "finstat/adapters/selectable/selectize",
       "finstat/helpers",
       "finstat/interval/view",
       "bootstrap",
       "bootstrap-editable"
-   ], function ($, helpers,transactionsListUnit) {
+   ], function ($, selectable, helpers,transactionsListUnit) {
       $.fn.editable.defaults.ajaxOptions = {
          beforeSend: function (xhr) {xhr.setRequestHeader("X-CSRFToken", helpers.getCookie('csrftoken'))}
       };
 
       transactionsListUnit.init({
          turnEditable: turnEditable,
-         turnDatePicker: turnDatePicker
+         turnDatePicker: turnDatePicker,
+         selectable: selectable
       });
       var transactionsListView = new transactionsListUnit.View();
       $(document).ready(function () {
@@ -44,6 +63,7 @@ require(["config"], function (document) {
       }
 
       function turnDatePicker(options) {
+         // todo возвращать не компонет а API
          var $deferred = new $.Deferred();
          require(["datepicker"], function () {
             var datepicker =
@@ -51,13 +71,22 @@ require(["config"], function (document) {
                   datepicker(
                      _.extend(options, {
                         'class': "datepicker-here",
-                        'dateFormat': 'yyyy-mm-dd'
+                        'dateFormat': 'yyyy-mm-dd',
+                        'autoClose': true
                      })
                   ).
                   data('datepicker');
             $deferred.resolve(datepicker);
          });
          return $deferred.promise();
+      }
+      
+      function turnSelectable() {
+         require(["selectize", "css!styles/selectize.bootstrap3", "css!styles/"], function () {
+            this.$('.ext_selectable').selectize({
+               create: true
+            });
+         });
       }
    });
 });

@@ -11,7 +11,7 @@ define([
    moment.locale('ru');
    var
       deps,
-      details = $.when(single.acccounts, single.categories);
+      detailsFetched = $.when(single.accounts.fetched, single.categories.fetched);
 
    // Models
 
@@ -54,7 +54,7 @@ define([
       },
       defaults: {
          date: moment().format('YYYY-MM-DD'),
-         amount: 0
+         amount: undefined
       },
       urlRoot: 'api/transactions',
 
@@ -164,7 +164,7 @@ define([
                "type": "object",
                "title": "Дата окончания интервала (объект moment.",
                "description": "Если не указана, то принимается равной дате начала. " +
-                  "Ответственность за неперекрытие интервалов лежит на сервере",
+               "Ответственность за неперекрытие интервалов лежит на сервере",
                "properties": {}
             },
             "transactions": {
@@ -334,20 +334,45 @@ define([
    });
 
    var TransactionFormView = Backbone.View.extend({
-      className: "row",
+      className: "row finstat__show-on-hover_area finstat__highlight-row",
       events: {
-         'click .finstat__add-icon': 'toggleForm',
-         'click .finstat__submit-icon': 'submit',
+         'click #finstat__form-submit': 'submit',
+         'click #finstat__form-date-dec': 'dateDec',
+         'click #finstat__form-date-inc': 'dateInc',
          'change input': 'onUserChange'
       },
-      expanded: false,
       template: _.template(formTpl),
       model: new Transaction(null, {alwaysNew: true}),
+      config: {
+         selectable: [{
+            id: 'fk_category',
+            annotations: 'categories'
+         }, {
+            id: 'fk_account_from',
+            annotations: 'accounts'
+         }, {
+            id: 'fk_account_to',
+            annotations: 'accounts'
+         }]
+      },
       initialize: function () {
          var self = this;
          var $deferred = new $.Deferred();
          this.listenTo(this, 'rendered', $deferred.resolve);
-         this.listenTo(this.model, 'change', this.onChange)
+         this.listenTo(this.model, 'change', this.onChange);
+         this.listenTo(this, 'rendered', function () {
+            detailsFetched.then(function () {
+               _.map(self.config.selectable, function (itemConfig) {
+                  deps.selectable.init({
+                     $target: self.$('#id_' + itemConfig.id),
+                     canCreate: true,
+                     annotations: single[itemConfig.annotations],
+                     model: self.model,
+                     attribute: itemConfig.id
+                  });
+               });
+            });
+         });
          this.waitDatepicker = $deferred.then(function () {
             return deps.turnDatePicker.call(this, {
                onSelect: function (formattedDate) {
@@ -361,9 +386,15 @@ define([
       },
       render: function () {
          this.$el.html(this.template(this.model.toJSON()));
-         this.toggleForm(this.expanded);
          this.trigger('rendered');
          return this;
+      },
+      //todo убрать в модель и изменить формат времени в модели на moment ( + методы parse и toJSON )
+      dateDec: function () {
+         this.model.set('date', moment(this.model.get('date')).subtract(1, 'days').format('YYYY-MM-DD'))
+      },
+      dateInc: function () {
+         this.model.set('date', moment(this.model.get('date')).add(1, 'days').format('YYYY-MM-DD'))
       },
       onUserChange: function (jqEvent) {
          console.dir({func: arguments.callee.name, args: arguments, ctx: this});
@@ -374,7 +405,6 @@ define([
          this.model.set(updated, {silent: true});
       },
       onChange: function (model, options) {
-         console.dir({func: arguments.callee.name, args: arguments, ctx: this});
          var
             self = this,
             changes = this.model.changedAttributes();
@@ -383,11 +413,6 @@ define([
                datepicker.selectDate(moment(self.model.get('date')).toDate());
             })
          }
-      },
-      toggleForm: function (value) {
-         this.expanded = value;
-         this.$('.finstat__add-icon').toggle(!value);
-         this.$('#finstat__form-edit-transaction').toggle(value);
       },
       submit: function () {
          var newTransaction = this.model.clone();

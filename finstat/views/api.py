@@ -10,6 +10,9 @@ class AccountList(generics.ListCreateAPIView):
     serializer_class = serializers.AccountSerializer
     permission_classes = (permissions.AllowAny,)
 
+    def perform_create(self, serializer):
+        serializer.save(fk_owner=models.Performer.objects.get(oo_performer=self.request.user.id or 1))
+
 
 class CategoryList(generics.ListCreateAPIView):
     queryset = models.Category.objects.all()

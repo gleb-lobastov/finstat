@@ -32,3 +32,7 @@
 .format__invisible {
     visibility: hidden;
 }
+
+.format__middle {
+    vertical-align: middle;
+}

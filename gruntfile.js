@@ -48,12 +48,15 @@ module.exports = function (grunt) {
                   'air-datepicker': {
                      files: ["dist/js/datepicker.js", "dist/css/datepicker.css"]
                   },
-                  'doT': {
-                     files: ["doT.js"]
+                  'selectize': {
+                     files: ["dist/js/selectize.js", "dist/css/selectize.css", "dist/css/selectize.bootstrap3.css"]
                   },
-                  'typeahead.js': {
-                     files: ["dist/typeahead.jquery.js"]
-                  },
+//                  'doT': {
+//                     files: ["doT.js"]
+//                  },
+//                  'typeahead.js': {
+//                     files: ["dist/typeahead.jquery.js"]
+//                  },
                   requirejs: {
                      js_dest: 'static/js'
                   }

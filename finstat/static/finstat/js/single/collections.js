@@ -7,26 +7,42 @@ define(['backbone'], function (Backbone) {
       TT_MOVE_OTHER: 4,
       TT_UNDEFINED: 5
    };
-
-   var Accounts = Backbone.Model.extend({});
    
-   var PromisedCollection = Backbone.Collection.extend({
+   var AnnotationsCollection = Backbone.Collection.extend({
+      keyField: 'id',
+      fetched: false,
+      annotationField: undefined,
+      /* Метод не связан с AnnotationsCollection, но общий для наследников. PromisedCollection*/
       initialize: function () {
          this.fetched = this.fetch()
-      }
-   });
-
-   var AccountsCollection = PromisedCollection.extend({
-      url: 'api/accounts',
-      model: Accounts,
+      },
+      /* Метод не связан с AnnotationsCollection, но общий для наследников. DRFCollection*/
       parse: function (response) {
          return response.results;
       },
+      toObject: function () {
+         return this.reduce(function (memo, model) {
+            memo[model.get(this.keyField)] = model.get(this.annotationField);
+            return memo;
+         }, {}, this);
+      },
       getName: function (id) {
          var model = this.get(id);
-         return model ? model.get('account_name') : undefined;
-      },
+         return model ? model.get(this.annotationField) : undefined;
+      }
+   });
 
+   var Accounts = Backbone.Model.extend({
+      urlRoot: 'api/accounts'
+   });
+   
+   var AccountsCollection = AnnotationsCollection.extend({
+      url: 'api/accounts',
+      model: Accounts,
+      annotationField: 'account_name',
+      parse: function (response) {
+         return response.results;
+      },
       getOperationType: function (id_from, id_to) {
          var
             modelFrom = this.get(id_from),
@@ -45,18 +61,14 @@ define(['backbone'], function (Backbone) {
       }
    });
 
-   var Categories = Backbone.Model.extend({});
+   var Categories = Backbone.Model.extend({
+      urlRoot: 'api/categories'
+   });
 
-   var CategoriesCollection = PromisedCollection.extend({
+   var CategoriesCollection = AnnotationsCollection.extend({
       url: 'api/categories',
       model: Categories,
-      parse: function (response) {
-         return response.results;
-      },
-      getName: function (id) {
-         var model = this.get(id);
-         return model ? model.get('category_name') : undefined;
-      }
+      annotationField: 'category_name'
    });
 
    return {

@@ -30,6 +30,8 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Account
 
+    fk_owner = serializers.ReadOnlyField(source='fk_owner.id')
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
