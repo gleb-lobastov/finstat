@@ -269,6 +269,12 @@ define([
             interval.get('transactions').add(transaction);
          }
       },
+      getTransactionById: function (id) {
+         var interval = this.find(function (interval) {
+            return interval.get('transactions').get(id);
+         });
+         return interval.get('transactions').get(id);
+      },
       getByDate: function (dateMoment) {
          return this.find(function (interval) {
             return interval.get('dateMoment').isSame(dateMoment, 'day');
@@ -299,10 +305,6 @@ define([
       dateSplitterTpl: _.template(headerTpl),
       render: function () {
          this.$el.html(this.template(this.model.resolveAttributes()));
-         deps.editable.init({
-            $target: this.$('.ext__editable-for-update'),
-            model: this.model
-         });
          return this;
       },
       destroy: function () {
@@ -355,8 +357,7 @@ define([
       }
    };
 
-   var TransactionFormView = Backbone.View.extend( 
-      _.extend({}, AwaitMixin, {
+   var TransactionFormView = Backbone.View.extend(_.extend({}, AwaitMixin, {
       className: "row finstat__show-on-hover_area finstat__highlight-row",
       events: {
          'click #finstat__form-submit': 'submit',
@@ -382,31 +383,33 @@ define([
          }]
       },
       initialize: function () {
-         var self = this;
          this.listenTo(this.model, 'change', this.onChange);
          this.listenTo(this, 'rendered', function () {
-            var datepickerAPI = deps.datepicker.init({
-               $target: self.$('#id_date'),
-               model: self.model
-            });
-            self.achieve('datepicker', datepickerAPI);
-            detailsFetched.then(function () {
-               _.map(self.config.selectable, function (itemConfig) {
-                  deps.selectable.init({
-                     $target: self.$('#id_' + itemConfig.id),
-                     canCreate: true,
-                     annotations: single[itemConfig.annotations],
-                     model: self.model,
-                     attribute: itemConfig.id
-                  });
-               });
-            });
+            this.initDatepicker();
+            this.initSelectable();
          });
       },
       render: function () {
          this.$el.html(this.template(this.model.toJSON()));
          this.trigger('rendered');
          return this;
+      },
+      initDatepicker: function () {
+         this.achieve('datepickerApi', deps.datepicker.init({
+            $target: this.$('#id_date'),
+            model: this.model
+         }));
+      },
+      initSelectable: function () {
+         _.map(this.config.selectable, function (itemConfig) {
+            deps.selectable.init({
+               $target: this.$('#id_' + itemConfig.id),
+               canCreate: true,
+               annotations: single[itemConfig.annotations],
+               model: this.model,
+               attribute: itemConfig.id
+            });
+         }, this);
       },
       //todo убрать в модель и изменить формат времени в модели на moment ( + методы parse и toJSON )
       dateDec: function () {
@@ -428,8 +431,8 @@ define([
             self = this,
             changes = this.model.changedAttributes();
          if (changes && 'date' in changes) {
-            this.wait('datepicker').then(function (datepicker) {
-               datepicker.selectDate(moment(self.model.get('date')).toDate());
+            this.wait('datepickerApi').then(function (api) {
+               api.selectDate(moment(self.model.get('date')).toDate());
             })
          }
       },
@@ -481,16 +484,31 @@ define([
    });
 
    var IntervalsView = Backbone.View.extend({
+      editableConfig: {
+         '.finstat__element-amount': {
+            mode: 'update'
+         },
+         '.finstat__element-category': {
+            mode: 'update',
+            annotate: 'category'
+         }
+      },
       formTemplate: _.template(formTpl),
       url: 'api/transactions',
       initialize: function () {
          this.listenTo(this.collection, 'reset update', function () {
-            $.when(
-               single.accounts.fetched,
-               single.categories.fetched
-            ).then(this.render.bind(this))
+            $.when(detailsFetched).then(this.render.bind(this))
          });
+         this.listenTo(this, 'rendered', this.initEditable);
          this.collection.fetch();
+      },
+      initEditable: function () {
+         _.map(this.editableConfig, function (options, selector) {
+            deps.editable.init(_.extend({
+               $target: this.$(selector),
+               collection: this.collection
+            }, options));
+         }, this);
       },
       render: function () {
          this.$el.empty();
@@ -498,6 +516,7 @@ define([
             var intervalView = new IntervalView({model: model});
             this.$el.append(intervalView.render().$el);
          }, this);
+         this.trigger('rendered');
          return this;
       }
    });

@@ -1,0 +1,16 @@
+.ext_selectable {
+    font-size: 14px;
+}
+.selectize-input {
+    max-height: 34px;
+    vertical-align: middle;
+}
+.selectize-input > div.item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    max-width: 100%;
+    white-space: nowrap;
+    margin-left: -30px;
+    padding-left: 30px;
+}

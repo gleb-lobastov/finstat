@@ -1,14 +1,22 @@
 <div class="col-md-2"></div>
 <div class="col-md-4 finstat__separator format__right">
-   <div class="format__inline-block format__ellipsis format__minor ext__editable-for-update"><%= category %></div>
+   <div class="format__inline-block format__ellipsis format__minor">
+      <span class="<%= rowClass %> ext__editable-update finstat__element-category"
+            data-type="text"
+            data-name="category"
+            data-title="Категория">
+         <%= category %>
+      </span>
+   </div>
    <div class="format__inline-block finstat__money">
-               <span
-                     class="<%= rowClass %> ext__editable-for-update"
-                     data-type="text"
-                     data-name="amount"
-                     data-url="/finstat/api/transactions/<%= id %>"
-                     data-title="Сумма"
-               ><%= amount %></span>
+      <span
+            class="<%= rowClass %> ext__editable-for-update finstat__element-amount"
+            data-type="text"
+            data-name="amount"
+            data-pk="<%= id %>"
+            data-title="Сумма">
+         <%= amount %>
+      </span>
    </div>
 </div>
 <div class="col-md-3 format__ellipsis"><%= comment %></div>

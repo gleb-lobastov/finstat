@@ -8,13 +8,13 @@ define([
    "finstat/helpers",
    "bootstrap-editable"
 ], function (_, helpers) {
-   
+
    $.fn.editable.defaults.ajaxOptions = {
       beforeSend: function (xhr) {
          xhr.setRequestHeader("X-CSRFToken", helpers.getCookie('csrftoken'))
       }
    };
-   
+
    return {
       init: init
    };
@@ -43,17 +43,20 @@ define([
                return result;
             }
          };
-         
-         if (options.model) {
-            settings.success = _createSuccessHandler(options.model)
+
+         if (options.collection) {
+            settings.success = _createSuccessHandler(options.collection);
+            options.$target.on('init', function (e, edt) {
+               edt.options.url = options.collection.url + '/' + edt.options.pk;
+            }).editable(settings);
          }
       }
-      options.$target.editable(settings);
    }
 
-   function _createSuccessHandler(model) {
+   function _createSuccessHandler(collection) {
       return function success(response) {
-         model.set(response);
+         collection.getTransactionById(response.id).set(response);
       }
    }
+
 });
