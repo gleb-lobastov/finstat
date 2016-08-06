@@ -299,7 +299,10 @@ define([
       dateSplitterTpl: _.template(headerTpl),
       render: function () {
          this.$el.html(this.template(this.model.resolveAttributes()));
-         deps.turnEditable.call(this);
+         deps.editable.init({
+            $target: this.$('.ext__editable-for-update'),
+            model: this.model
+         });
          return this;
       },
       destroy: function () {
@@ -333,7 +336,27 @@ define([
       }
    });
 
-   var TransactionFormView = Backbone.View.extend({
+   var AwaitMixin = {
+      _storage: {},
+      _wait: function (key) {
+         if (!this._storage[key]) {
+            this._storage[key] = new $.Deferred();
+         }
+         return this._storage[key];
+      },
+      wait: function (key) {
+         return this._wait(key).promise();
+      },
+      achieve: function (key, result) {
+         var self = this;
+         $.when(result).then(function (resolved) {
+            self._wait(key).resolve(resolved);
+         });
+      }
+   };
+
+   var TransactionFormView = Backbone.View.extend( 
+      _.extend({}, AwaitMixin, {
       className: "row finstat__show-on-hover_area finstat__highlight-row",
       events: {
          'click #finstat__form-submit': 'submit',
@@ -344,6 +367,9 @@ define([
       template: _.template(formTpl),
       model: new Transaction(null, {alwaysNew: true}),
       config: {
+         datepicker: {
+            id: 'date'
+         },
          selectable: [{
             id: 'fk_category',
             annotations: 'categories'
@@ -357,10 +383,13 @@ define([
       },
       initialize: function () {
          var self = this;
-         var $deferred = new $.Deferred();
-         this.listenTo(this, 'rendered', $deferred.resolve);
          this.listenTo(this.model, 'change', this.onChange);
          this.listenTo(this, 'rendered', function () {
+            var datepickerAPI = deps.datepicker.init({
+               $target: self.$('#id_date'),
+               model: self.model
+            });
+            self.achieve('datepicker', datepickerAPI);
             detailsFetched.then(function () {
                _.map(self.config.selectable, function (itemConfig) {
                   deps.selectable.init({
@@ -373,16 +402,6 @@ define([
                });
             });
          });
-         this.waitDatepicker = $deferred.then(function () {
-            return deps.turnDatePicker.call(this, {
-               onSelect: function (formattedDate) {
-                  self.model.set({'date': formattedDate}, {silent: true});
-               }
-            });
-         });
-//         this.waitDatepicker.then(function (datepicker) {
-//            datepicker.onSelect()
-//         });
       },
       render: function () {
          this.$el.html(this.template(this.model.toJSON()));
@@ -409,7 +428,7 @@ define([
             self = this,
             changes = this.model.changedAttributes();
          if (changes && 'date' in changes) {
-            this.waitDatepicker.then(function (datepicker) {
+            this.wait('datepicker').then(function (datepicker) {
                datepicker.selectDate(moment(self.model.get('date')).toDate());
             })
          }
@@ -419,7 +438,7 @@ define([
          this.collection.appendTransaction(newTransaction);
          newTransaction.save();
       }
-   });
+   }));
 
    var IntervalHeaderView = Backbone.View.extend({
       className: "row finstat__tall-row finstat__highlight-row",

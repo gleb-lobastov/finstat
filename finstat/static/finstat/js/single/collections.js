@@ -14,7 +14,7 @@ define(['backbone'], function (Backbone) {
       annotationField: undefined,
       /* Метод не связан с AnnotationsCollection, но общий для наследников. PromisedCollection*/
       initialize: function () {
-         this.fetched = this.fetch()
+         this.fetched = this.fetch();
       },
       toObject: function () {
          return this.reduce(function (memo, model) {
