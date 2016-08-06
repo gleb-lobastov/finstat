@@ -9,6 +9,7 @@ class AccountList(generics.ListCreateAPIView):
     queryset = models.Account.objects.all()
     serializer_class = serializers.AccountSerializer
     permission_classes = (permissions.AllowAny,)
+    pagination_class = None
 
     def perform_create(self, serializer):
         serializer.save(fk_owner=models.Performer.objects.get(oo_performer=self.request.user.id or 1))
@@ -18,6 +19,7 @@ class CategoryList(generics.ListCreateAPIView):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
     permission_classes = (permissions.AllowAny,)
+    pagination_class = None
 
 
 class TransactionMixin(object):

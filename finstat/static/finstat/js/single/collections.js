@@ -16,10 +16,6 @@ define(['backbone'], function (Backbone) {
       initialize: function () {
          this.fetched = this.fetch()
       },
-      /* Метод не связан с AnnotationsCollection, но общий для наследников. DRFCollection*/
-      parse: function (response) {
-         return response.results;
-      },
       toObject: function () {
          return this.reduce(function (memo, model) {
             memo[model.get(this.keyField)] = model.get(this.annotationField);
@@ -40,9 +36,6 @@ define(['backbone'], function (Backbone) {
       url: 'api/accounts',
       model: Accounts,
       annotationField: 'account_name',
-      parse: function (response) {
-         return response.results;
-      },
       getOperationType: function (id_from, id_to) {
          var
             modelFrom = this.get(id_from),
