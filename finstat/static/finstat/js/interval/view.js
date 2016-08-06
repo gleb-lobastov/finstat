@@ -9,9 +9,7 @@ define([
    'locale/ru'
 ], function (Backbone, _, moment, single, transactionTpl, headerTpl, formTpl) {
    moment.locale('ru');
-   var
-      deps,
-      detailsFetched = $.when(single.accounts.fetched, single.categories.fetched);
+   var detailsFetched = $.when(single.accounts.fetched, single.categories.fetched);
 
    // Models
 
@@ -80,25 +78,22 @@ define([
       },
       resolveAttributes: function () { // to view and presenter
          var
-            values = this.toJSON(),
-            resolved = {};
+            values = this.toJSON();
          switch (values.transaction_type) {
             case single.consts.TT_INCOME:
-               resolved.rowClass = 'finstat__bar-income';
+               values.rowClass = 'finstat__bar-income';
                break;
             case single.consts.TT_OUTCOME:
-               resolved.rowClass = 'finstat__bar-outcome';
+               values.rowClass = 'finstat__bar-outcome';
                break;
             default:
-               resolved.rowClass = '';
+               values.rowClass = '';
          }
-         resolved.account_from = single.accounts.getName(values.fk_account_from);
-         resolved.account_to = single.accounts.getName(values.fk_account_to);
-         resolved.category = single.categories.getName(values.fk_category);
-         resolved.id = values.id;
-         resolved.amount = values.amount;
-         resolved.comment = values.comment;
-         return resolved;
+         values.account_from = single.accounts.getName(values.fk_account_from);
+         values.account_to = single.accounts.getName(values.fk_account_to);
+         values.category = single.categories.getName(values.fk_category);
+         values.amount = values.amount;
+         return values;
       },
       sign: function () {
          var transactionType = this.get('transaction_type');
@@ -367,22 +362,25 @@ define([
       },
       template: _.template(formTpl),
       model: new Transaction(null, {alwaysNew: true}),
-      config: {
-         datepicker: {
-            id: 'date'
+      datepicker: undefined,
+      selectable: undefined,
+      selectableConfig: {
+         '#id_fk_category': {
+            annotations: 'categories',
+            attribute: 'fk_category'
          },
-         selectable: [{
-            id: 'fk_category',
-            annotations: 'categories'
-         }, {
-            id: 'fk_account_from',
-            annotations: 'accounts'
-         }, {
-            id: 'fk_account_to',
-            annotations: 'accounts'
-         }]
+         '#id_fk_account_from': {
+            annotations: 'accounts',
+            attribute: 'fk_account_from'
+         },
+         '#id_fk_account_to' : {
+            annotations: 'accounts',
+            attribute: 'fk_account_to'
+         }
       },
-      initialize: function () {
+      initialize: function (options) {
+         this.datepicker = options.dependencies && options.dependencies.datepicker;
+         this.selectable = options.dependencies && options.dependencies.selectable;
          this.listenTo(this.model, 'change', this.onChange);
          this.listenTo(this, 'rendered', function () {
             this.initDatepicker();
@@ -395,21 +393,25 @@ define([
          return this;
       },
       initDatepicker: function () {
-         this.achieve('datepickerApi', deps.datepicker.init({
-            $target: this.$('#id_date'),
-            model: this.model
-         }));
+         if (this.datepicker) {
+            this.achieve('datepickerApi', this.datepicker.init({
+               $target: this.$('#id_date'),
+               model: this.model
+            }));
+         }
       },
       initSelectable: function () {
-         _.map(this.config.selectable, function (itemConfig) {
-            deps.selectable.init({
-               $target: this.$('#id_' + itemConfig.id),
-               canCreate: true,
-               annotations: single[itemConfig.annotations],
-               model: this.model,
-               attribute: itemConfig.id
-            });
-         }, this);
+         if (this.selectable) {
+            _.map(this.selectableConfig, function (options, selector) {
+               this.selectable.init({
+                  $target: this.$(selector),
+                  canCreate: true,
+                  annotations: single[options.annotations],
+                  model: this.model,
+                  attribute: options.attribute
+               });
+            }, this);
+         }
       },
       //todo убрать в модель и изменить формат времени в модели на moment ( + методы parse и toJSON )
       dateDec: function () {
@@ -484,27 +486,31 @@ define([
    });
 
    var IntervalsView = Backbone.View.extend({
+      editable: undefined,
       editableConfig: {
          '.finstat__element-amount': {
             mode: 'update'
          },
          '.finstat__element-category': {
             mode: 'update',
-            annotate: 'category'
+            annotations: single.categories
          }
       },
       formTemplate: _.template(formTpl),
       url: 'api/transactions',
-      initialize: function () {
+      initialize: function (options) {
+         this.editable = options.dependencies && options.dependencies.editable;
          this.listenTo(this.collection, 'reset update', function () {
             $.when(detailsFetched).then(this.render.bind(this))
          });
-         this.listenTo(this, 'rendered', this.initEditable);
+         if (this.editable) {
+            this.listenTo(this, 'rendered', this.initEditable);
+         }
          this.collection.fetch();
       },
       initEditable: function () {
          _.map(this.editableConfig, function (options, selector) {
-            deps.editable.init(_.extend({
+            this.editable.init(_.extend({
                $target: this.$(selector),
                collection: this.collection
             }, options));
@@ -528,21 +534,21 @@ define([
             this.form.model.set('date', intervalHeader.model.get('dateMoment').format("YYYY-MM-DD"));
          }
       },
-      initialize: function () {
-         var intervals = new Intervals();
-         this.intervalsView = new IntervalsView({collection: intervals});
-         this.form = new TransactionFormView({collection: intervals});
+      initialize: function (options) {
+         options = options || {};
+         options.collection = new Intervals();
+         this.intervalsView = new IntervalsView(options);
+         this.form = new TransactionFormView(options);
       },
       render: function () {
-         this.$el.empty().append(this.form.render().$el).append(this.intervalsView.$el); // рендер по событию
+         this.$el.empty().
+            append(this.form.render().$el).
+            append(this.intervalsView.$el);
          return this;
       }
    });
 
    return {
-      init: function (dependencies) {
-         deps = dependencies;
-      },
       View: TransactionsListView
    };
 });

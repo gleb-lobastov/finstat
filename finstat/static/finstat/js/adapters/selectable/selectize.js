@@ -50,7 +50,7 @@ define([
 
    function _converter(label, id) {
       return {
-         value: id,
+         value: +id,
          text: label
       }
    }

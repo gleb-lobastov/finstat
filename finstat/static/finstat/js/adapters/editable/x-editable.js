@@ -22,35 +22,45 @@ define([
    /**
     *
     * @param options {Object} Набор опций в формате независимом от используемого компонента
-    * @param options.$target {JQuery} Селектор для инициализации selectize.
-    * @param options.model {Backbone.Model} Модель к которой применяется выборка
-    * @param options.attribute {string} Аттрибут модели
+    * @param options.$target {JQuery} Селектор для инициализации editable.
+    * @param options.collection {Intervals} Коллекция интервалов на изменения в транзакциях которых вешается x-editable
     */
 
    function init(options) {
-      var settings = {};
+      var
+         annotated = !!options.annotations,
+         settings = {};
       options.mode = options.mode || 'update';
-      if (options.mode === 'update') {
-         settings = {
-            ajaxOptions: {
-               type: "PATCH",
-               beforeSend: $.fn.editable.defaults.ajaxOptions.beforeSend
-            },
-            send: 'always',
-            params: function (params) {
-               var result = {};
-               result[params.name] = params.value;
-               return result;
-            }
-         };
 
-         if (options.collection) {
-            settings.success = _createSuccessHandler(options.collection);
-            options.$target.on('init', function (e, edt) {
-               edt.options.url = options.collection.url + '/' + edt.options.pk;
-            }).editable(settings);
+      // Если options.annotations заданно, то выполняем только после загрузки данных, иначе сразу
+      $.when(annotated ? options.annotations.fetched : true).then(function () {
+         if (options.mode === 'update') {
+            settings = {
+               ajaxOptions: {
+                  type: "PATCH",
+                  beforeSend: $.fn.editable.defaults.ajaxOptions.beforeSend
+               },
+               type: annotated ? 'select' : 'text',
+               send: 'always',
+               params: function (params) {
+                  var result = {};
+                  result[params.name] = params.value;
+                  return result;
+               }
+            };
+
+            if (annotated) {
+               settings.source = options.annotations.toObject();
+            }
+            if (options.collection) {
+               settings.success = _createSuccessHandler(options.collection);
+               options.$target.on('init', function (e, edt) {
+                  edt.options.url = options.collection.url + '/' + edt.options.pk;
+               });
+            }
+            options.$target.editable(settings);
          }
-      }
+      });
    }
 
    function _createSuccessHandler(collection) {
