@@ -1,0 +1,84 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 18px !important;
+}
+
+
+/* Интерактивные элементы */
+.finstat__show-on-hover,
+.finstat-hidden {
+    visibility: hidden;
+}
+
+.finstat__show-on-hover_area:hover .finstat__show-on-hover,
+.finstat__show-on-hover:hover {
+    visibility: visible;
+}
+
+
+.finstat__icon {
+    background-color: gray;
+    border-radius: 100%;
+}
+
+.finstat__separator {
+    border-right: 1px solid rgb(127, 127, 127);
+    border-right: 1px solid rgba(127, 127, 127, 0.5);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
+.finstat__fast-date-switcher {
+    position: absolute;
+    /*display: inline-block;*/
+    text-align: right;
+    /*vertical-align: middle;*/
+    right: 100%;
+    padding-right: 8px;
+}
+
+.finstat__extra-switcher {
+    position: absolute;
+    left: 100%;
+    padding-left: 8px;
+    top: 0;
+}
+
+.finstat__tall-row.row {
+    position: relative;
+}
+
+.finstat__highlight-row:hover {
+    background-color: lightyellow;
+}
+
+.finstat__tall-row /*~ .finstat__tall-row */> div{
+    padding-top: 2em;
+    padding-bottom: 0.5em;
+}
+
+.finstat__money {
+    width: 90px;
+}
+
+.finstat__add-icon:hover, .finstat__remove-icon:hover, .finstat__submit-icon:hover {
+    color: orange;
+}
+
+.finstat__show-on-hover_area:hover .finstat__element-comment:empty::before {
+    content: "+ комментарий";
+    color: gray;
+    font-size: 0.7em;
+}
+.finstat__show-on-hover_area:hover .finstat__element-comment:empty{
+    text-decoration: underline;
+}
+
+.finstat__submit-icon {
+    margin: auto 5px;
+}
+
+.ext__editable-for-insert:hover,
+.ext__editable-for-update:hover{
+    text-decoration: underline;
+}

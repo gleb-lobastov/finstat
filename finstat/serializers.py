@@ -18,7 +18,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 class TransactionSerializerPartial(serializers.Serializer):
     id = serializers.IntegerField()
     date = serializers.DateField()
-    category = serializers.CharField()
+    category = serializers.CharField(allow_null=True)
     comment = serializers.CharField()
     fk_account_from = serializers.IntegerField()
     fk_account_to = serializers.IntegerField()

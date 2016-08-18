@@ -179,6 +179,6 @@ finstat/components/converter
 # Fixtures
 finstat/fixtures
 node_modules/
-static/components/selectboxit/
-static/components/
+bower_components/
+**/static/*
 .sass-cache/

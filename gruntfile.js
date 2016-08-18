@@ -17,14 +17,17 @@ module.exports = function (grunt) {
       },
       bower: {
          dev: {
+            dest: 'static/vendor2',
+            fonts_dest: 'static/vendor2/fonts',
             options: {
                keepExpandedHierarchy: false,
+               expand: true,
                packageSpecific: {
                   'bootstrap': {
                      files: [
                         'dist/css/bootstrap.css',
                         'dist/fonts/*',
-                        'dist/js/bootstrap.js',
+                        'dist/js/bootstrap.js'
                      ]
                   },
                   'x-editable': {
@@ -42,30 +45,14 @@ module.exports = function (grunt) {
                         'locale/en-gb.js'
                      ]
                   },
-                  // 'bootstrap-datepicker': {
-                  // files: ["dist/js/bootstrap-datepicker.js"]
-                  // },
                   'air-datepicker': {
                      files: ["dist/js/datepicker.js", "dist/css/datepicker.css"]
                   },
                   'selectize': {
                      files: ["dist/js/selectize.js", "dist/css/selectize.css", "dist/css/selectize.bootstrap3.css"]
-                  },
-//                  'doT': {
-//                     files: ["doT.js"]
-//                  },
-//                  'typeahead.js': {
-//                     files: ["dist/typeahead.jquery.js"]
-//                  },
-                  requirejs: {
-                     js_dest: 'static/js'
                   }
                }
-            },
-            dest: 'static/other/vendor',
-            js_dest: 'static/js/vendor',
-            css_dest: 'static/styles/vendor',
-            fonts_dest: 'static/styles/fonts'
+            }
          }
       },
       copy: {

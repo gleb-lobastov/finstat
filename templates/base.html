@@ -1,17 +1,17 @@
 {% load staticfiles %}
 <!DOCTYPE html>
-<html lang="en" ng-app="{% block app_name %}defaultApp{% endblock %}">
+<html lang="en">
 <head>
    <title>{% block title %}My amazing site{% endblock %}</title>
 
    {# Основные стили. Все прочие должны быть добавлены через require.js #}
    {% block styles %}
-      <link rel="stylesheet" href="{% static 'styles/vendor/bootstrap.css' %}">
-      <link rel="stylesheet" href="{% static 'styles/vendor/normalize.css' %}">
+{#      <link rel="stylesheet" href="{% static 'styles/vendor/bootstrap.css' %}">#}
+{#      <link rel="stylesheet" href="{% static 'styles/vendor/normalize.css' %}">#}
    {% endblock %}
 
    {# Точка входа в js (RequireJS) #}
-   <script data-main="{% static '' %}{% block config_file %}main{% endblock %}" src="{% static 'js/require.js' %}"></script>
+   <script data-main="{% static '' %}{% block config_file %}main{% endblock %}" src="{% static 'vendor/require.js' %}"></script>
 
 {#   <link rel="stylesheet" href="{% static 'dist/base.css' %}" />#}
 {#      <link rel="stylesheet" href="{% static 'components/rouble/b-rub_georgia/stylesheet.css' %}">#}

@@ -3,12 +3,10 @@
 {% load staticfiles %}
 
 {% block app_name %}finstatApp{% endblock %}
-{% block config_file %}finstat/js/init{% endblock %}
+{% block config_file %}finstat/init{% endblock %}
 
 {% block styles %}
    {{ block.super }}
-   <link rel="stylesheet" href="{% static 'finstat/finstat.css' %}">
-   <link rel="stylesheet" href="{% static 'finstat/components.css' %}">
    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 {% endblock %}
 

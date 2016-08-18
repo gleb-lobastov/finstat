@@ -1,0 +1,50 @@
+<div class="col-md-2"></div>
+<div class="col-md-4 finstat__separator format__right">
+   <div class="format__inline-block format__ellipsis format__minor">
+      <span class="ext__editable-update finstat__element-category"
+            data-name="fk_category"
+            data-pk="<%= id %>"
+            data-title="Категория"
+            data-value="<%= fk_category %>"><%= category %></span>
+   </div>
+   <div class="format__inline-block finstat__money">
+      <span
+            class="<%= rowClass %> ext__editable-for-update finstat__element-amount"
+            data-type="text"
+            data-name="amount"
+            data-pk="<%= id %>"
+            data-title="Сумма"><%= amount %></span>
+   </div>
+</div>
+<div class="col-md-3">
+   <div>
+      <span
+         class="ext__editable-for-update finstat__element-comment format__ellipsis format__block"
+         data-type="text"
+         data-name="comment"
+         data-pk="<%= id %>"
+         data-title="Комментарий"><%= comment %></span>
+   </div>
+</div>
+<div class="col-md-1 format__minor">
+   <span
+      class="finstat__element-account"
+      data-name="fk_account_from"
+      data-value="<%= fk_account_from %>"
+      data-title="Счет списания"
+      data-pk="<%= id %>"><%= account_from %></span>
+   <% if (account_to) { %>
+   <span class="glyphicon glyphicon-arrow-right"></span>
+   <span
+      class="finstat__element-account"
+      data-name="fk_account_to"
+      data-value="<%= fk_account_to %>"
+      data-title="Счет зачисления"
+      data-pk="<%= id %>"><%= account_to %></span>
+   <% } %>
+</div>
+<div class="col-md-2">
+   <div class="col-md-12 format__right finstat__remove-icon finstat__show-on-hover">
+      <span class="glyphicon glyphicon-remove"></span>
+   </div>
+</div>

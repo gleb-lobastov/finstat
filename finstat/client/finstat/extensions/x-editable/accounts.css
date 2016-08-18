@@ -1,0 +1,9 @@
+.ext__editable-account {
+    display: block;
+    margin-bottom: 5px;  
+}
+
+.ext__editable-account span {
+    width: 70px;  
+    display: inline-block;
+}
