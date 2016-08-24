@@ -1,6 +1,4 @@
 var
-   debug = true,
-
    _ = require('underscore'),
    pluginsLoader = require('gulp-load-plugins'),
    util = require('gulp-util'),
@@ -55,8 +53,6 @@ function outputPaths(options) {
    return paths(options, buildConfig.outputDir);
 }
 
-
-
 /**
  * Функция получающая список плагинов через gulp-load-plugins и расширяющая этот список
  * дополнительными действиям, на основе загруженных плагинов
@@ -71,12 +67,20 @@ function availableActions() {
       // Направляет вывод в папку static. В проекте принято, что клиентские исходники хранятся в папке client,
       // а сборку django берет из папки static. Поэтому переименовываем client в static
       return plugins.rename(function (path) {
-         var before = path.dirname;
+//         var before = path.dirname;
          path.dirname = path.dirname.replace(inputDirRE, buildConfig.outputDir);
-         if (debug) {
-            console.log(before + ' => ' + path.dirname);
-         }
+//         console.log(before + ' => ' + path.dirname);
       });
+   };
+
+   plugins.organizeBowerFiles = function organizeBowerFiles(path) {
+      return plugins.rename(function (path) {
+         if (path.dirname.indexOf('moment') !== -1 && path.basename !== 'moment') {
+            path.dirname = 'moment/locale';
+         } else {
+            path.dirname = '';
+         }
+      })
    };
 
    plugins.mainBowerFiles = function _mainBowerFiles(filter) {
@@ -95,9 +99,7 @@ function concern(actions) {
       {},
       _.mapObject(pluginEnvConfig, function (taskConfig, name) {
          var acceptedEnv = _.isArray(taskConfig) ? taskConfig : [taskConfig];
-         if (debug) {
-            console.log(name + ' ' + (acceptedEnv.indexOf(environment) !== -1 ? 'indclued' : 'excluded'));
-         }
+//         console.log(name + ' ' + (acceptedEnv.indexOf(environment) !== -1 ? 'indclued' : 'excluded'));
          return acceptedEnv.indexOf(environment) === -1 ? util.noop : actions[name];
       }),
       actions

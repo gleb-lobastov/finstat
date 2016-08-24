@@ -36,7 +36,46 @@
    "overrides": {
       "bootstrap": {
          "main": {
-            "dev": ["dist/js/bootstrap.js", "dist/css/bootstrap.css", "dist/css/bootstrap-theme.css", "dist/fonts/*.*"]
+            "dev": [
+               "dist/js/bootstrap.js",
+               "dist/css/bootstrap.css",
+               "dist/css/bootstrap-theme.css",
+               "dist/fonts/*.*"
+            ]
+         }
+      },
+      "moment": {
+         "main": {
+            "dev": [
+               "moment.js",
+               "locale/ru.js"
+            ]
+         }
+      },
+      "selectize": {
+         "main": {
+            "dev": [
+               "dist/js/selectize.js",
+               "dist/css/selectize.css",
+               "dist/css/selectize.bootstrap3.css"
+            ]
+         }
+      },
+      "x-editable": {
+         "main": {
+            "dev": [
+               "dist/bootstrap3-editable/js/bootstrap-editable.js",
+               "dist/bootstrap3-editable/css/bootstrap-editable.css",
+               "dist/bootstrap3-editable/img/**"
+            ]
+         }
+      },
+      "air-datepicker": {
+         "main": {
+            "dev": [
+               "dist/js/datepicker.js",
+               "dist/css/datepicker.css"
+            ]
          }
       }
    }

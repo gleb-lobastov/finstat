@@ -5,7 +5,7 @@ define([
    'text!./resources/transaction.html',
    'text!./resources/header.html',
    'text!./resources/form.html',
-   'locale/ru'
+   'moment/locale/ru'
 ], function (Backbone, moment, single, transactionTpl, headerTpl, formTpl) {
    moment.locale('ru');
    var detailsFetched = $.when(single.accounts.fetched, single.categories.fetched);
