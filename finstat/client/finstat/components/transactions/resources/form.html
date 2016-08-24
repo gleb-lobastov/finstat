@@ -1,4 +1,4 @@
-<form id="finstat__form-edit-transaction" class="form-inline">
+<form id="finstat__form-edit-transaction" class="form-inline finstat__form-light-gutter">
    <div class="col-md-1"></div>
    <div class="col-md-2 form-group format__relative">
       <div class="input-group">
@@ -9,7 +9,7 @@
             </span>
          <input class="form-control ext__air-datepicker" id="id_date" name="date" type="text"
                 value="<%=date%>">
-            <span class="input-group-btn">
+         <span class="input-group-btn">
               <button id="finstat__form-date-inc" class="btn btn-default" type="button">
                   <span class="glyphicon glyphicon-chevron-right"></span>
               </button>
@@ -28,9 +28,11 @@
       <select class="ext_selectable" id="id_fk_category" name="fk_category"></select>
    </div>
    <div class="col-md-2 form-group format__relative">
-      <select class="ext_selectable format__inline-block" id="id_fk_account_from" name="fk_account_from"></select>
-      <span class="glyphicon glyphicon-refresh"></span>
-      <select class="ext_selectable format__inline-block" id="id_fk_account_to" name="fk_account_to"></select>
+      <div class="finstat__form-accounts">
+         <select class="ext_selectable finstat__form-account" id="id_fk_account_from" name="fk_account_from"></select>
+         <span class="glyphicon glyphicon-refresh"></span>
+         <select class="ext_selectable finstat__form-account" id="id_fk_account_to" name="fk_account_to"></select>
+      </div>
    </div>
    <div class="col-md-1">
       <button type="button" id="finstat__form-submit" class="btn btn-primary">Сохранить</button>

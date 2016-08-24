@@ -8,7 +8,7 @@ define([
    "bootstrap",
    "selectize",
    "css!selectize.bootstrap3",
-   "css!finstat/adapters/selectable/selectize"
+   "css!./selectize"
 ], function (_) {
    return {
       init: init

@@ -7,6 +7,7 @@ define([
    "underscore",
    "finstat/components/helpers",
    "finstat/extensions/x-editable/accounts",
+   "css!./x-editable",
    "bootstrap",
    "bootstrap-editable"
 ], function (_, helpers) {

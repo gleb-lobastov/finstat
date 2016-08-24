@@ -1,6 +1,3 @@
-.ext_selectable {
-    font-size: 14px;
-}
 .selectize-input {
     max-height: 34px;
     vertical-align: middle;
@@ -13,4 +10,13 @@
     white-space: nowrap;
     margin-left: -30px;
     padding-left: 30px;
+}
+
+.ext__selectize-half-cell {
+    width: calc(100%/2 - 8px);
+    display: inline-block;
+}
+
+.ext__selectize-half-cell + .glyphicon {
+    padding: 0 4px;
 }

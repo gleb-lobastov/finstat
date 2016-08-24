@@ -5,6 +5,8 @@ define([
    'text!./resources/transaction.html',
    'text!./resources/header.html',
    'text!./resources/form.html',
+   'css!./resources/transaction',
+   'css!./resources/form',
    'moment/locale/ru'
 ], function (Backbone, moment, single, transactionTpl, headerTpl, formTpl) {
    moment.locale('ru');
