@@ -5,14 +5,31 @@
  */
 define([
    "underscore",
+   "finstat/tools",
+   'finstat/components/single/collections',
    "bootstrap",
    "selectize",
    "css!selectize.bootstrap3",
    "css!./selectize"
-], function (_) {
+], function (_, tools, single) {
    return {
       init: init
    };
+
+   function init(view) {
+      view.on('rendered', function () {
+         _.map(view.selectableConfig, function (options, selector) {
+            _selectize({
+               $target: view.$(selector),
+               canCreate: true,
+               annotations: single[options.annotations],
+               model: view.model,
+               attribute: options.attribute,
+               placeholder: options.placeholder
+            });
+         }, view);
+      });
+   }
 
    /**
     *
@@ -24,7 +41,7 @@ define([
     * @param options.model {Backbone.Model} Модель к которой применяется выборка
     * @param options.attribute {string} Аттрибут модели
     */
-   function init(options) {
+   function _selectize(options) {
       var annotated = !!options.annotations;
 
       // Если options.annotations заданно, то выполняем только после загрузки данных, иначе сразу
@@ -66,7 +83,7 @@ define([
 
    function _createAddAnnotationHandler(annotations) {
       return function addAnnotation(input, callback) {
-         var 
+         var
             attributes = {},
             model;
          attributes[annotations.annotationField] = input;

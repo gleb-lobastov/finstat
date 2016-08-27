@@ -2,13 +2,14 @@ define([
    'backbone',
    'moment',
    'finstat/components/single/collections',
+   'finstat/tools',
    'text!./resources/transaction.html',
    'text!./resources/header.html',
    'text!./resources/form.html',
    'css!./resources/transaction',
    'css!./resources/form',
    'moment/locale/ru'
-], function (Backbone, moment, single, transactionTpl, headerTpl, formTpl) {
+], function (Backbone, moment, single, tools, transactionTpl, headerTpl, formTpl) {
    moment.locale('ru');
    var detailsFetched = $.when(single.accounts.fetched, single.categories.fetched);
 
@@ -337,26 +338,7 @@ define([
       }
    });
 
-   var AwaitMixin = {
-      _storage: {},
-      _wait: function (key) {
-         if (!this._storage[key]) {
-            this._storage[key] = new $.Deferred();
-         }
-         return this._storage[key];
-      },
-      wait: function (key) {
-         return this._wait(key).promise();
-      },
-      achieve: function (key, result) {
-         var self = this;
-         $.when(result).then(function (resolved) {
-            self._wait(key).resolve(resolved);
-         });
-      }
-   };
-
-   var TransactionFormView = Backbone.View.extend(_.extend({}, AwaitMixin, {
+   var TransactionFormView = Backbone.View.extend({
       className: "row finstat__show-on-hover_area finstat__highlight-row",
       events: {
          'click #finstat__form-submit': 'submit',
@@ -366,8 +348,9 @@ define([
       },
       template: _.template(formTpl),
       model: new Transaction(null, {alwaysNew: true}),
-      datepicker: undefined,
-      selectable: undefined,
+      datepickerConfig: {
+         target: '#id_date'
+      },
       selectableConfig: {
          '#id_fk_category': {
             annotations: 'categories',
@@ -379,47 +362,26 @@ define([
             attribute: 'fk_account_from',
             placeholder: 'Со счета'
          },
-         '#id_fk_account_to' : {
+         '#id_fk_account_to': {
             annotations: 'accounts',
             attribute: 'fk_account_to',
             placeholder: 'На счет'
          }
       },
       initialize: function (options) {
-         this.datepicker = options.dependencies && options.dependencies.datepicker;
-         this.selectable = options.dependencies && options.dependencies.selectable;
+         var
+            datepicker = options.dependencies && options.dependencies.datepicker,
+            selectable = options.dependencies && options.dependencies.selectable;
+
+         this.datepickerApi = datepicker.init(this);
+         selectable.init(this);
+
          this.listenTo(this.model, 'change', this.onChange);
-         this.listenTo(this, 'rendered', function () {
-            this.initDatepicker();
-            this.initSelectable();
-         });
       },
       render: function () {
          this.$el.html(this.template(this.model.toJSON()));
          this.trigger('rendered');
          return this;
-      },
-      initDatepicker: function () {
-         if (this.datepicker) {
-            this.achieve('datepickerApi', this.datepicker.init({
-               $target: this.$('#id_date'),
-               model: this.model
-            }));
-         }
-      },
-      initSelectable: function () {
-         if (this.selectable) {
-            _.map(this.selectableConfig, function (options, selector) {
-               this.selectable.init({
-                  $target: this.$(selector),
-                  canCreate: true,
-                  annotations: single[options.annotations],
-                  model: this.model,
-                  attribute: options.attribute,
-                  placeholder: options.placeholder
-               });
-            }, this);
-         }
       },
       //todo убрать в модель и изменить формат времени в модели на moment ( + методы parse и toJSON )
       dateDec: function () {
@@ -441,9 +403,7 @@ define([
             self = this,
             changes = this.model.changedAttributes();
          if (changes && 'date' in changes) {
-            this.wait('datepickerApi').then(function (api) {
-               api.selectDate(moment(self.model.get('date')).toDate());
-            })
+            this.datepickerApi.selectDate(moment(self.model.get('date')).toDate());
          }
       },
       submit: function () {
@@ -451,7 +411,7 @@ define([
          this.collection.appendTransaction(newTransaction);
          newTransaction.save();
       }
-   }));
+   });
 
    var IntervalHeaderView = Backbone.View.extend({
       className: "row finstat__tall-row finstat__highlight-row",
@@ -511,22 +471,12 @@ define([
       formTemplate: _.template(formTpl),
       url: 'api/transactions',
       initialize: function (options) {
-         this.editable = options.dependencies && options.dependencies.editable;
+         var editable = options.dependencies && options.dependencies.editable;
+         editable.init(this);
          this.listenTo(this.collection, 'reset update', function () {
             $.when(detailsFetched).then(this.render.bind(this))
          });
-         if (this.editable) {
-            this.listenTo(this, 'rendered', this.initEditable);
-         }
          this.collection.fetch();
-      },
-      initEditable: function () {
-         _.map(this.editableConfig, function (options, selector) {
-            this.editable.init(_.extend({
-               $target: this.$(selector),
-               collection: this.collection
-            }, options));
-         }, this);
       },
       render: function () {
          this.$el.empty();
@@ -553,9 +503,7 @@ define([
          this.form = new TransactionFormView(options);
       },
       render: function () {
-         this.$el.empty().
-            append(this.form.render().$el).
-            append(this.intervalsView.$el);
+         this.$el.empty().append(this.form.render().$el).append(this.intervalsView.$el);
          return this;
       }
    });

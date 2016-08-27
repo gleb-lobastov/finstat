@@ -5,12 +5,14 @@
  */
 define([
    "underscore",
+   "finstat/tools",
+   'finstat/components/single/collections',
    "finstat/components/helpers",
    "finstat/extensions/x-editable/accounts",
    "css!./x-editable",
    "bootstrap",
    "bootstrap-editable"
-], function (_, helpers) {
+], function (_, tools, single, helpers) {
 
    $.fn.editable.defaults.ajaxOptions = {
       beforeSend: function (xhr) {
@@ -22,6 +24,17 @@ define([
       init: init
    };
 
+   function init(view) {
+      view.on('rendered', function () {
+         _.map(this.editableConfig, function (options, selector) {
+            _editable(_.extend({
+               $target: view.$(selector),
+               collection: view.collection
+            }, options));
+         }, view);
+      });
+   }
+
    /**
     *
     * @param options {Object} Набор опций в формате независимом от используемого компонента
@@ -29,7 +42,7 @@ define([
     * @param options.collection {Intervals} Коллекция интервалов на изменения в транзакциях которых вешается x-editable
     */
 
-   function init(options) {
+   function _editable(options) {
       var
          annotated = !!options.annotations,
          settings = {};
