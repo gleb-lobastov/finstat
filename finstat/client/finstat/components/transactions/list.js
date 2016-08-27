@@ -371,15 +371,18 @@ define([
       selectableConfig: {
          '#id_fk_category': {
             annotations: 'categories',
-            attribute: 'fk_category'
+            attribute: 'fk_category',
+            placeholder: 'Категория'
          },
          '#id_fk_account_from': {
             annotations: 'accounts',
-            attribute: 'fk_account_from'
+            attribute: 'fk_account_from',
+            placeholder: 'Со счета'
          },
          '#id_fk_account_to' : {
             annotations: 'accounts',
-            attribute: 'fk_account_to'
+            attribute: 'fk_account_to',
+            placeholder: 'На счет'
          }
       },
       initialize: function (options) {
@@ -412,7 +415,8 @@ define([
                   canCreate: true,
                   annotations: single[options.annotations],
                   model: this.model,
-                  attribute: options.attribute
+                  attribute: options.attribute,
+                  placeholder: options.placeholder
                });
             }, this);
          }

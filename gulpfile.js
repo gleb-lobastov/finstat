@@ -1,7 +1,9 @@
 var
    gulp = require('gulp'),
+   gutil = require('gulp-util'),
    del = require('del'),
    merge = require('merge-stream'),
+   browserSync = require('browser-sync'),
    config = require('./gulpconfig'),
    job = config.job;
 
@@ -11,6 +13,12 @@ gulp.task('clean', function () {
    del.sync(config.outputPaths());
 });
 
+gulp.task('browser-sync', function () {
+    browserSync({
+        proxy: "localhost:8082",
+        port: 8083
+    });
+});
 
 gulp.task('styles', function () {
    var
@@ -20,6 +28,7 @@ gulp.task('styles', function () {
    return merge(sass, css)
       .pipe(job.formatPath())
       .pipe(job.concat('styles.css'))
+      .on('error', gutil.log)
       .pipe(gulp.dest('./'));
 });
 
@@ -35,7 +44,8 @@ gulp.task('scripts', function () {
 gulp.task('markup', function () {
    return gulp.src(config.inputPaths('html'), {base: "./"})
       .pipe(job.formatPath())
-      .pipe(gulp.dest('./'));
+      .pipe(gulp.dest('./'))
+      .pipe(browserSync.reload({stream: true}));
 });
 
 gulp.task('vendor', function () {
@@ -62,5 +72,5 @@ gulp.task('watch', function () {
    gulp.watch(config.inputPaths('html'), ['markup']);
 });
 
-gulp.task('default', ['watch']);
+gulp.task('default', ['browser-sync', 'watch']);
 gulp.task('build', ['clean', 'scripts', 'styles', 'markup', 'vendor']);

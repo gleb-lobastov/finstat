@@ -29,7 +29,9 @@ define([
 
       // Если options.annotations заданно, то выполняем только после загрузки данных, иначе сразу
       $.when(annotated ? options.annotations.fetched : true).then(function () {
-         var settings = {};
+         var settings = {
+            placeholder: options.placeholder
+         };
 
          if (annotated) {
             settings.options = _.map(options.annotations.toObject(), _converter);
