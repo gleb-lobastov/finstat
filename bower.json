@@ -1,82 +1,83 @@
 {
-   "name": "settings",
-   "description": "123",
-   "main": "file",
-   "moduleType": [],
-   "keywords": [
-      "some"
-   ],
-   "authors": [
-      "gleb"
-   ],
-   "license": "mit",
-   "homepage": "homepage",
-   "private": true,
-   "ignore": [
-      "**/.*",
-      "node_modules",
-      "bower_components",
-      "test",
-      "tests"
-   ],
-   "dependencies": {
-      "bootstrap": "~3.3.5",
-      "moment": "~2.10.6",
-      "requirejs": "~2.1.20",
-      "backbone": "~1.3.3",
-      "require-css": "~0.1.8",
-      "air-datepicker": "~1.2.3",
-      "selectize": "~0.12.1",
-      "x-editable": "~1.5.1",
-      "text": "requirejs-text#~2.0.15"
-   },
-   "resolutions": {
-      "backbone": "~1.3.3"
-   },
-   "overrides": {
-      "bootstrap": {
-         "main": {
-            "dev": [
-               "dist/js/bootstrap.js",
-               "dist/css/bootstrap.css",
-               "dist/css/bootstrap-theme.css",
-               "dist/fonts/*.*"
-            ]
-         }
-      },
-      "moment": {
-         "main": {
-            "dev": [
-               "moment.js",
-               "locale/ru.js"
-            ]
-         }
-      },
-      "selectize": {
-         "main": {
-            "dev": [
-               "dist/js/selectize.js",
-               "dist/css/selectize.css",
-               "dist/css/selectize.bootstrap3.css"
-            ]
-         }
-      },
-      "x-editable": {
-         "main": {
-            "dev": [
-               "dist/bootstrap3-editable/js/bootstrap-editable.js",
-               "dist/bootstrap3-editable/css/bootstrap-editable.css",
-               "dist/bootstrap3-editable/img/**"
-            ]
-         }
-      },
-      "air-datepicker": {
-         "main": {
-            "dev": [
-               "dist/js/datepicker.js",
-               "dist/css/datepicker.css"
-            ]
-         }
+  "name": "settings",
+  "description": "123",
+  "main": "file",
+  "moduleType": [],
+  "keywords": [
+    "some"
+  ],
+  "authors": [
+    "gleb"
+  ],
+  "license": "mit",
+  "homepage": "homepage",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.5",
+    "moment": "~2.10.6",
+    "requirejs": "~2.1.20",
+    "backbone": "~1.3.3",
+    "require-css": "~0.1.8",
+    "air-datepicker": "~1.2.3",
+    "selectize": "~0.12.1",
+    "x-editable": "~1.5.1",
+    "text": "requirejs-text#~2.0.15",
+    "bootbox.js": "bootbox#~4.4.0"
+  },
+  "resolutions": {
+    "backbone": "~1.3.3"
+  },
+  "overrides": {
+    "bootstrap": {
+      "main": {
+        "dev": [
+          "dist/js/bootstrap.js",
+          "dist/css/bootstrap.css",
+          "dist/css/bootstrap-theme.css",
+          "dist/fonts/*.*"
+        ]
       }
-   }
+    },
+    "moment": {
+      "main": {
+        "dev": [
+          "moment.js",
+          "locale/ru.js"
+        ]
+      }
+    },
+    "selectize": {
+      "main": {
+        "dev": [
+          "dist/js/selectize.js",
+          "dist/css/selectize.css",
+          "dist/css/selectize.bootstrap3.css"
+        ]
+      }
+    },
+    "x-editable": {
+      "main": {
+        "dev": [
+          "dist/bootstrap3-editable/js/bootstrap-editable.js",
+          "dist/bootstrap3-editable/css/bootstrap-editable.css",
+          "dist/bootstrap3-editable/img/**"
+        ]
+      }
+    },
+    "air-datepicker": {
+      "main": {
+        "dev": [
+          "dist/js/datepicker.js",
+          "dist/css/datepicker.css"
+        ]
+      }
+    }
+  }
 }

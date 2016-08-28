@@ -338,7 +338,16 @@ define([
       }
    });
 
-   var TransactionFormView = Backbone.View.extend({
+   var PluginsMixin = {
+      pluginsApi: {},
+      initPlugins: function (plugins, required) {
+         _.each(required, function (name) {
+            this.pluginsApi[name] = plugins[name].init(this);
+         }, this);
+      }
+   };
+
+   var TransactionFormView = Backbone.View.extend(_.extend({}, PluginsMixin, {
       className: "row finstat__show-on-hover_area finstat__highlight-row",
       events: {
          'click #finstat__form-submit': 'submit',
@@ -368,14 +377,13 @@ define([
             placeholder: 'На счет'
          }
       },
+      editableConfig: {
+         '.finstat__element-amount, .finstat__element-comment': {
+            mode: 'update'
+         }
+      },
       initialize: function (options) {
-         var
-            datepicker = options.dependencies && options.dependencies.datepicker,
-            selectable = options.dependencies && options.dependencies.selectable;
-
-         this.datepickerApi = datepicker.init(this);
-         selectable.init(this);
-
+         this.initPlugins(options.plugins, ['datepicker', 'selectable']);
          this.listenTo(this.model, 'change', this.onChange);
       },
       render: function () {
@@ -403,7 +411,7 @@ define([
             self = this,
             changes = this.model.changedAttributes();
          if (changes && 'date' in changes) {
-            this.datepickerApi.selectDate(moment(self.model.get('date')).toDate());
+            this.pluginsApi.datepicker.selectDate(moment(self.model.get('date')).toDate());
          }
       },
       submit: function () {
@@ -411,7 +419,7 @@ define([
          this.collection.appendTransaction(newTransaction);
          newTransaction.save();
       }
-   });
+   }));
 
    var IntervalHeaderView = Backbone.View.extend({
       className: "row finstat__tall-row finstat__highlight-row",
@@ -453,7 +461,7 @@ define([
       }
    });
 
-   var IntervalsView = Backbone.View.extend({
+   var IntervalsView = Backbone.View.extend(_.extend({}, PluginsMixin, {
       editable: undefined,
       editableConfig: {
          '.finstat__element-amount, .finstat__element-comment': {
@@ -471,8 +479,7 @@ define([
       formTemplate: _.template(formTpl),
       url: 'api/transactions',
       initialize: function (options) {
-         var editable = options.dependencies && options.dependencies.editable;
-         editable.init(this);
+         this.initPlugins(options.plugins, ['editable']);
          this.listenTo(this.collection, 'reset update', function () {
             $.when(detailsFetched).then(this.render.bind(this))
          });
@@ -487,7 +494,7 @@ define([
          this.trigger('rendered');
          return this;
       }
-   });
+   }));
 
    /* Список транзакций. Состоит из формы добавления транзакции и списка интервалов */
    var TransactionsListView = Backbone.View.extend({

@@ -13,7 +13,7 @@ require(["config"], function (document) {
       require(["css!finstat/styles/finstat.css", "css!finstat/styles/components.css"]);
 
       var transactionsListView = new transactionsListUnit.View({
-         dependencies: {
+         plugins: {
             editable: editable,
             datepicker: datepicker,
             selectable: selectable

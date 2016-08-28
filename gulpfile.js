@@ -29,7 +29,8 @@ gulp.task('styles', function () {
       .pipe(job.formatPath())
       .pipe(job.concat('styles.css'))
       .on('error', gutil.log)
-      .pipe(gulp.dest('./'));
+      .pipe(gulp.dest('./'))
+      .pipe(browserSync.reload({stream: true}));
 });
 
 
@@ -38,7 +39,8 @@ gulp.task('scripts', function () {
       .pipe(job.print())
       .pipe(job.formatPath())
       .pipe(job.concat('finstat.js'))
-      .pipe(gulp.dest('./'));
+      .pipe(gulp.dest('./'))
+      .pipe(browserSync.reload({stream: true}));
 });
 
 gulp.task('markup', function () {
