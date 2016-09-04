@@ -353,6 +353,7 @@ define([
          'click #finstat__form-submit': 'submit',
          'click #finstat__form-date-dec': 'dateDec',
          'click #finstat__form-date-inc': 'dateInc',
+         'click #finstat__form-ctrl-swap': 'swap',
          'change input': 'onUserChange'
       },
       template: _.template(formTpl),
@@ -406,12 +407,30 @@ define([
          updated[$input.attr('name')] = $input.val();
          this.model.set(updated, {silent: true});
       },
+      swap: function () {
+        var
+           account_from = this.model.get('fk_account_from'),
+           account_to = this.model.get('fk_account_to');
+         this.model.set({
+            fk_account_from: account_to,
+            fk_account_to: account_from
+         });
+      },
       onChange: function (model, options) {
          var
             self = this,
             changes = this.model.changedAttributes();
-         if (changes && 'date' in changes) {
+         if (!changes) {
+            return;
+         }
+         if('date' in changes) {
             this.pluginsApi.datepicker.selectDate(moment(self.model.get('date')).toDate());
+         }
+         if ('fk_account_from' in changes) {
+            this.$('#id_fk_account_from')[0].selectize.setValue(self.model.get('fk_account_from'))
+         }
+         if ('fk_account_to' in changes) {
+            this.$('#id_fk_account_to')[0].selectize.setValue(self.model.get('fk_account_to'))
          }
       },
       submit: function () {

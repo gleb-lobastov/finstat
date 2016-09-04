@@ -8,7 +8,7 @@ define([
    "finstat/tools",
    'finstat/components/single/collections',
    "finstat/components/helpers",
-   "finstat/extensions/x-editable/accounts",
+//   "finstat/extensions/x-editable/accounts",
    "css!./x-editable",
    "bootstrap",
    "bootstrap-editable"

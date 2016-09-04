@@ -28,17 +28,17 @@ define([
       this._waiting = new Waiting()
    }
 
-   FutureApi.prototype.init = function (resolvedApi) {
-      this._waiting.achieve('api', resolvedApi);
+   FutureApi.prototype.init = function (resolvedApi, controlId) {
+      this._waiting.achieve(controlId || 'default_api', resolvedApi);
    };
 
-   FutureApi.prototype.method = function (methodName) {
+   FutureApi.prototype.method = function (methodName, controlId) {
       var api = this;
       return function forwarder() {
          var
             context = this,
             args = arguments;
-         return api._waiting.wait('api').then(function (resolvedApi) {
+         return api._waiting.wait(controlId || 'default_api').then(function (resolvedApi) {
             return resolvedApi[methodName].apply(context, args);
          });
       }

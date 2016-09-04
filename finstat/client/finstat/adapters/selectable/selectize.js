@@ -4,6 +4,7 @@
  * API для всех адаптеров: метод init с параметром options.
  */
 define([
+   "jquery",
    "underscore",
    "finstat/tools",
    'finstat/components/single/collections',
@@ -11,12 +12,14 @@ define([
    "selectize",
    "css!selectize.bootstrap3",
    "css!./selectize"
-], function (_, tools, single) {
+], function ($, _, tools, single) {
    return {
       init: init
    };
 
    function init(view) {
+      var futureApi = new tools.FutureApi();
+
       view.on('rendered', function () {
          _.map(view.selectableConfig, function (options, selector) {
             _selectize({
@@ -45,7 +48,7 @@ define([
       var annotated = !!options.annotations;
 
       // Если options.annotations заданно, то выполняем только после загрузки данных, иначе сразу
-      $.when(annotated ? options.annotations.fetched : true).then(function () {
+      return $.when(annotated ? options.annotations.fetched : true).then(function () {
          var settings = {
             placeholder: options.placeholder
          };
@@ -64,7 +67,7 @@ define([
             settings.onChange = _createOnChangeHandler(options.model, options.attribute)
          }
 
-         options.$target.selectize(settings);
+         return options.$target.selectize(settings);
       });
    }
 
