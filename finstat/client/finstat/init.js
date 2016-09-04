@@ -6,8 +6,9 @@ require(["config"], function (document) {
       "finstat/adapters/selectable/selectize",
       "finstat/adapters/datepicker/airDatepicker",
       "finstat/adapters/editable/x-editable",
+      "finstat/adapters/editable/bootbox",
       "finstat/components/transactions/list"
-   ], function ($, selectable, datepicker, editable, transactionsListUnit) {
+   ], function ($, selectable, datepicker, editableLegacy, editable, transactionsListUnit) {
 
       // Вынесено сюда для загрузки позже bootstrap.css
       require(["css!finstat/styles/finstat.css", "css!finstat/styles/components.css"]);
@@ -15,6 +16,7 @@ require(["config"], function (document) {
       var transactionsListView = new transactionsListUnit.View({
          plugins: {
             editable: editable,
+            editableLegacy: editableLegacy,
             datepicker: datepicker,
             selectable: selectable
          }

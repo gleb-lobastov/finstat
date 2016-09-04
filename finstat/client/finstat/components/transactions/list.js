@@ -55,7 +55,12 @@ define([
       defaults: {
          date: moment().format('YYYY-MM-DD'),
          amount: undefined,
-         comment: ''
+         comment: '',
+         fk_category: null,
+         fk_account_from: null,
+         fk_account_to: null,
+         fk_place: null,
+         fk_company: null
       },
       urlRoot: 'api/transactions',
 
@@ -101,7 +106,9 @@ define([
          return values;
       },
       sign: function () {
-         var transactionType = this.get('transaction_type');
+         var transactionType =
+            this.get('transaction_type') ||
+            single.accounts.getOperationType(this.get('fk_account_from'), this.get('fk_account_to'));
          if (transactionType === single.consts.TT_INCOME) {
             return +1;
          } else if (transactionType === single.consts.TT_OUTCOME) {
@@ -379,12 +386,24 @@ define([
          }
       },
       editableConfig: {
-         '.finstat__element-amount, .finstat__element-comment': {
-            mode: 'update'
+         '.finstat__form-comment': {
+            mode: 'update',
+            field: 'comment',
+            use: 'model',
+            question: function (model) {
+               switch (model.sign()) {
+                  case 0:
+                     return 'Куда переведены деньги?';
+                  case 1:
+                     return 'Откуда пришли деньги?';
+                  default:
+                     return 'На что потрачены деньги?';
+               }
+            }
          }
       },
       initialize: function (options) {
-         this.initPlugins(options.plugins, ['datepicker', 'selectable']);
+         this.initPlugins(options.plugins, ['datepicker', 'selectable', 'editable']);
          this.listenTo(this.model, 'change', this.onChange);
       },
       render: function () {
@@ -408,9 +427,9 @@ define([
          this.model.set(updated, {silent: true});
       },
       swap: function () {
-        var
-           account_from = this.model.get('fk_account_from'),
-           account_to = this.model.get('fk_account_to');
+         var
+            account_from = this.model.get('fk_account_from'),
+            account_to = this.model.get('fk_account_to');
          this.model.set({
             fk_account_from: account_to,
             fk_account_to: account_from
@@ -423,7 +442,7 @@ define([
          if (!changes) {
             return;
          }
-         if('date' in changes) {
+         if ('date' in changes) {
             this.pluginsApi.datepicker.selectDate(moment(self.model.get('date')).toDate());
          }
          if ('fk_account_from' in changes) {
@@ -432,10 +451,14 @@ define([
          if ('fk_account_to' in changes) {
             this.$('#id_fk_account_to')[0].selectize.setValue(self.model.get('fk_account_to'))
          }
+         if ('comment' in changes) {
+            this.$('#id_comment').toggleClass('finstat__implicit-value', !!self.model.get('comment'))
+         }
       },
       submit: function () {
          var newTransaction = this.model.clone();
          this.collection.appendTransaction(newTransaction);
+         this.model.set('comment', '');
          newTransaction.save();
       }
    }));
@@ -481,8 +504,8 @@ define([
    });
 
    var IntervalsView = Backbone.View.extend(_.extend({}, PluginsMixin, {
-      editable: undefined,
-      editableConfig: {
+      editableLegacy: undefined,
+      editableLegacyConfig: {
          '.finstat__element-amount, .finstat__element-comment': {
             mode: 'update'
          },
@@ -498,7 +521,7 @@ define([
       formTemplate: _.template(formTpl),
       url: 'api/transactions',
       initialize: function (options) {
-         this.initPlugins(options.plugins, ['editable']);
+         this.initPlugins(options.plugins, ['editableLegacy']);
          this.listenTo(this.collection, 'reset update', function () {
             $.when(detailsFetched).then(this.render.bind(this))
          });

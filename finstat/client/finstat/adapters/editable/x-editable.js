@@ -26,7 +26,7 @@ define([
 
    function init(view) {
       view.on('rendered', function () {
-         _.map(this.editableConfig, function (options, selector) {
+         _.map(this.editableLegacyConfig, function (options, selector) {
             _editable(_.extend({
                $target: view.$(selector),
                collection: view.collection

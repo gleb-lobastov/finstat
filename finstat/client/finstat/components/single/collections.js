@@ -24,7 +24,7 @@ define(['backbone'], function (Backbone) {
       },
       getName: function (id) {
          var model = this.get(id);
-         return model ? model.get(this.annotationField) : undefined;
+         return model ? model.get(this.annotationField) : '';
       }
    });
 
@@ -43,9 +43,6 @@ define(['backbone'], function (Backbone) {
             isFromOwn = modelFrom && modelFrom.get('account_type') === 'OW',
             isToOwn = modelTo && modelTo.get('account_type') === 'OW';
 
-         if (isFromOwn === undefined || isToOwn === undefined) {
-            return consts.TT_UNDEFINED;
-         }
          if (isFromOwn) {
             return isToOwn ? consts.TT_MOVE_OWN : consts.TT_OUTCOME;
          } else {
