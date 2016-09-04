@@ -44,7 +44,11 @@ gulp.task('scripts', function () {
 });
 
 gulp.task('markup', function () {
-   return gulp.src(config.inputPaths('html'), {base: "./"})
+   var
+      pug = gulp.src(config.inputPaths('pug'), {base: "./"}).pipe(job.pug()),
+      html = gulp.src(config.inputPaths('html'), {base: "./"});
+
+   return merge(pug, html)
       .pipe(job.formatPath())
       .pipe(gulp.dest('./'))
       .pipe(browserSync.reload({stream: true}));
@@ -70,7 +74,9 @@ gulp.task('vendor', function () {
 
 gulp.task('watch', function () {
    gulp.watch(config.inputPaths('js'), ['scripts']);
+   gulp.watch(config.inputPaths('css'), ['styles']);
    gulp.watch(config.inputPaths('sass'), ['styles']);
+   gulp.watch(config.inputPaths('pug'), ['markup']);
    gulp.watch(config.inputPaths('html'), ['markup']);
 });
 

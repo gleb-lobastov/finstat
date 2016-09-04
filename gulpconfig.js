@@ -8,7 +8,7 @@ var
 
    buildConfig = {
       apps: ['finstat', 'layouts', 'face'],
-      gulpPlugins: ['gulp-*', 'gulp.*', 'browser-sync', 'pug'],
+      gulpPlugins: ['gulp-*', 'gulp.*', 'browser-sync'],
       inputDir: 'client',
       outputDir: 'static',
       mainBowerFiles: {

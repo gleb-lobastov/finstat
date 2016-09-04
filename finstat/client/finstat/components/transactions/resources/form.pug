@@ -1,0 +1,43 @@
+form#finstat__form-edit-transaction.form-inline.finstat__form-light-gutter
+
+    .col-md-1.finstat__form-extra-actions
+        span.glyphicon.glyphicon-briefcase.finstat__action
+        span.glyphicon.glyphicon-map-marker.finstat__action
+
+    .col-md-2.form-group.format__relative
+        .input-group
+            span.input-group-btn
+                button#finstat__form-date-dec.btn.btn-default(type='button')
+                    span.glyphicon.glyphicon-chevron-left
+            input#id_date.form-control.ext__air-datepicker(name='date', type='text', value!='<%=date%>')
+            span.input-group-btn
+                button#finstat__form-date-inc.btn.btn-default(type='button')
+                    span.glyphicon.glyphicon-chevron-right
+
+    .col-md-2.form-group.format__relative
+        .input-group
+            span.input-group-addon ₽
+            input#finstat__form-amount.form-control(name='amount', placeholder='Сумма', type='text', value!='<%=amount%>')
+            span.input-group-addon .00
+
+    .col-md-2.form-group.format__relative
+        select#id_fk_category.ext_selectable(name='fk_category')
+
+    .col-md-3.form-group.format__relative
+        .finstat__form-fill-block
+            select#id_fk_account_from.ext_selectable.finstat__form-fill-item(name='fk_account_from')
+            span#finstat__form-ctrl-swap.glyphicon.glyphicon-refresh.finstat__gap.finstat__action
+            select#id_fk_account_to.ext_selectable.finstat__form-fill-item(name='fk_account_to')
+
+    .col-md-1
+        .finstat__form-fill-block
+            span#id_comment.glyphicon.glyphicon-comment.finstat__gap-right.finstat__form-comment.finstat__action
+            .finstat__form-fill-item
+                button#finstat__form-submit.btn.btn-primary(type='button') Сохранить
+
+    .col-md-1.finstat__form-extra-actions
+        span.glyphicon.glyphicon-cog
+
+    #finstat__extra-popup-tpl.format__hidden
+        div
+            input#id_fk_performer(name='fk_performer', type='hidden', value='1')

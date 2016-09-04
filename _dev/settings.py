@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # SITE_ID = 1
@@ -30,7 +31,8 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             "builtins": [
-                "easy_pjax.templatetags.pjax_tags"
+                "easy_pjax.templatetags.pjax_tags",
+                'pyjade.ext.django.templatetags'
             ],
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -38,12 +40,17 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            "loaders": [
+                ('pyjade.ext.django.Loader', (
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                ))
+            ]
         },
     },
 ]
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -78,22 +85,21 @@ ROOT_URLCONF = '_dev.urls'
 
 WSGI_APPLICATION = '_dev.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
 DATABASES = {
-   'default': {
-      'ENGINE': 'django.db.backends.postgresql_psycopg2',
-      'NAME': 'postgres',
-      'USER': 'postgres',
-      'PASSWORD': 'glruDB123',
-      'HOST': 'localhost', # Set to empty string for localhost.
-      'PORT': '', # Set to empty string for default.
-      'TEST': {
-         'NAME': 'test_db'
-      }
-   }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'glruDB123',
+        'HOST': 'localhost',  # Set to empty string for localhost.
+        'PORT': '',  # Set to empty string for default.
+        'TEST': {
+            'NAME': 'test_db'
+        }
+    }
 }
 
 # Internationalization
@@ -108,7 +114,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
