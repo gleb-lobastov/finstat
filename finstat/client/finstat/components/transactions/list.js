@@ -306,7 +306,8 @@ define([
    var TransactionView = Backbone.View.extend({
       className: "row finstat__show-on-hover_area finstat__highlight-row",
       events: {
-         'click .finstat__remove-icon': "destroy"
+         'click .finstat__remove-icon': "destroy",
+         'click #finstat__form-category-filler': "fillCategory"
       },
       template: _.template(transactionTpl),
       dateSplitterTpl: _.template(headerTpl),
@@ -317,6 +318,9 @@ define([
       destroy: function () {
          this.model.destroy();
          this.remove();
+      },
+      fillCategory: function () {
+         this.$el.trigger('clicked:categoryFiller', this);
       }
    });
 
@@ -454,6 +458,9 @@ define([
          if ('comment' in changes) {
             this.$('#id_comment').toggleClass('finstat__implicit-value', !!self.model.get('comment'))
          }
+         if ('fk_category' in changes) {
+            this.$('#id_fk_category')[0].selectize.setValue(self.model.get('fk_category'))
+         }
       },
       submit: function () {
          var newTransaction = this.model.clone();
@@ -543,6 +550,9 @@ define([
       events: {
          'clicked:date': function (jqEvent, intervalHeader) {
             this.form.model.set('date', intervalHeader.model.get('dateMoment').format("YYYY-MM-DD"));
+         },
+         'clicked:categoryFiller': function (jqEvent, interval) {
+            this.form.model.set('fk_category', interval.model.get('fk_category'));
          }
       },
       initialize: function (options) {

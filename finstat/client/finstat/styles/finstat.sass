@@ -11,7 +11,7 @@ body
 .finstat__gap,
 .finstat__gap-left
   padding-left: $gap
- 
+
 /* Интерактивные элементы
 
 .finstat__show-on-hover, .finstat-hidden
@@ -66,13 +66,19 @@ body
 .finstat__add-icon:hover, .finstat__remove-icon:hover, .finstat__submit-icon:hover
   color: orange
 
-.finstat__show-on-hover_area:hover .finstat__element-comment:empty
+.finstat__show-on-hover_area:hover .finstat__element-comment:empty,
+.finstat__show-on-hover_area:hover .finstat__element-category:empty
   &::before
-    content: "+ комментарий"
-    color: gray
-    font-size: 0.7em
+    content: "+ " attr(data-title)
 
   text-decoration: underline
+  color: gray
+
+.finstat__show-on-hover_area:hover .finstat__element-comment:empty::before
+  font-size: 0.7em
+
+.finstat__element-category:empty ~ .finstat__show-on-hover
+  visibility: hidden
 
 .finstat__submit-icon
   margin: auto 5px
