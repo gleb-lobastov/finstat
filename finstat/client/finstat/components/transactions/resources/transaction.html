@@ -27,7 +27,7 @@
          data-title="Комментарий"><%= comment %></span>
    </div>
 </div>
-<div class="col-md-1 format__minor">
+<div class="col-md-1 format__minor format__nowrap">
    <span
       class="finstat__element-account"
       data-name="fk_account_from"
@@ -35,17 +35,17 @@
       data-title="Счет списания"
       data-pk="<%= id %>"><%= account_from %></span>
    <% if (account_to) { %>
-   <span class="glyphicon glyphicon-arrow-right"></span>
+      <span class="glyphicon glyphicon-arrow-right"></span>
+   <% } else if (!account_from) { %>
+      <span class="finstat__show-on-hover">/</span>
+   <% } %>
    <span
       class="finstat__element-account"
       data-name="fk_account_to"
       data-value="<%= fk_account_to %>"
       data-title="Счет зачисления"
       data-pk="<%= id %>"><%= account_to %></span>
-   <% } %>
 </div>
-<div class="col-md-2">
-   <div class="col-md-12 format__right finstat__remove-icon finstat__show-on-hover">
-      <span class="glyphicon glyphicon-remove"></span>
-   </div>
+<div class="col-md-2 format__right finstat__remove-icon finstat__show-on-hover">
+   <span class="glyphicon glyphicon-remove"></span>
 </div>

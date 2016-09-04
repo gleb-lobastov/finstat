@@ -67,12 +67,14 @@ body
   color: orange
 
 .finstat__show-on-hover_area:hover .finstat__element-comment:empty,
-.finstat__show-on-hover_area:hover .finstat__element-category:empty
+.finstat__show-on-hover_area:hover .finstat__element-category:empty,
+.finstat__show-on-hover_area:hover .finstat__element-account:empty
   &::before
     content: "+ " attr(data-title)
 
-  text-decoration: underline
   color: gray
+  text-decoration: underline
+  white-space: nowrap
 
 .finstat__show-on-hover_area:hover .finstat__element-comment:empty::before
   font-size: 0.7em
