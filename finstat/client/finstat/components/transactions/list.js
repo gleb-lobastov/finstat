@@ -349,16 +349,7 @@ define([
       }
    });
 
-   var PluginsMixin = {
-      pluginsApi: {},
-      initPlugins: function (plugins, required) {
-         _.each(required, function (name) {
-            this.pluginsApi[name] = plugins[name].init(this);
-         }, this);
-      }
-   };
-
-   var TransactionFormView = Backbone.View.extend(_.extend({}, PluginsMixin, {
+   var TransactionFormView = Backbone.View.extend(_.extend({}, tools.PluginsMixin, {
       className: "row finstat__show-on-hover_area finstat__highlight-row",
       events: {
          'click #finstat__form-submit': 'submit',
@@ -510,7 +501,7 @@ define([
       }
    });
 
-   var IntervalsView = Backbone.View.extend(_.extend({}, PluginsMixin, {
+   var IntervalsView = Backbone.View.extend(_.extend({}, tools.PluginsMixin, {
       editableLegacy: undefined,
       editableLegacyConfig: {
          '.finstat__element-amount, .finstat__element-comment': {

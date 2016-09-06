@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from finstat.views import transactions, api
+from finstat import views, api
 
 urlpatterns = patterns(
     '',
@@ -13,10 +13,7 @@ urlpatterns = patterns(
     url(r'^api/categories$', api.CategoryList.as_view(), name='accounts_list'),
 
     # pjax supporting templates
-    url(r'^transactions$', transactions.base_view, name='finstat-transactions-index'),
-    url(r'^transactions_tl$', transactions.timeline_pjax_html, {'page': 1}, name='finstat-transactions-index'),
-    # url(r'^transactions/page(?P<page>\d+)$', transactions.timeline_pjax_html, name='finstat-list_view'),
-    # url(r'^transactions/(?P<interval>((daily)|(monthly)|(annual)))/page(?P<page>\d+)$',
+    url(r'^.*', views.index, name='finstat-transactions-index'),
     #     transactions.transactions_stats_view, name='finstat-transactions-overview'),
     # transactions/year2015/month10/day1
     # 2015 +1000000 - 999999

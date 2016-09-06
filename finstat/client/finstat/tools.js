@@ -44,8 +44,18 @@ define([
       }
    };
 
+   var PluginsMixin = {
+      pluginsApi: {},
+      initPlugins: function (plugins, required) {
+         _.each(required, function (name) {
+            this.pluginsApi[name] = plugins[name].init(this);
+         }, this);
+      }
+   };
+
    return {
       Waiting: Waiting,
-      FutureApi: FutureApi
+      FutureApi: FutureApi,
+      PluginsMixin: PluginsMixin
    }
 });

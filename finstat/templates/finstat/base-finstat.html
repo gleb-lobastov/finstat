@@ -10,4 +10,16 @@
    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 {% endblock %}
 
+{% block header %}
+   <div id="finstat__header">
+      {% block finstat_header %}
+      {% endblock %}
+   </div>
+{% endblock %}
 
+{% block content %}
+   <div id="finstat__content">
+      {% block finstat_content %}
+      {% endblock %}
+   </div>
+{% endblock %}

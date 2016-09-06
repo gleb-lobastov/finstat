@@ -50,6 +50,7 @@ gulp.task('markup', function () {
 
    return merge(pug, html)
       .pipe(job.formatPath())
+      .on('error', gutil.log)
       .pipe(gulp.dest('./'))
       .pipe(browserSync.reload({stream: true}));
 });
