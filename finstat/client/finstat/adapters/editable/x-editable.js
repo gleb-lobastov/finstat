@@ -5,7 +5,7 @@
  */
 define([
    "underscore",
-   "finstat/tools",
+   "finstat/misc/tools",
    'finstat/components/single/collections',
    "finstat/components/helpers",
 //   "finstat/extensions/x-editable/accounts",

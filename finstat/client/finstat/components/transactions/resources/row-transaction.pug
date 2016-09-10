@@ -1,0 +1,46 @@
+.col-md-2
+.col-md-4.finstat__separator.format__right
+    .format__inline-block.format__ellipsis.format__minor
+        span.ext__editable-update.finstat__element-category(
+            data-name='fk_category',
+            data-pk!='<%= id %>',
+            data-title='Категория',
+            data-value!='<%= fk_category %>'
+        ) <%= category %>
+        span#finstat__form-category-filler.glyphicon.glyphicon-arrow-up.finstat__show-on-hover.finstat__action
+    .format__inline-block.finstat__money
+        span.rowClass.ext__editable-for-update.finstat__element-amount(
+            class!='<%= rowClass%>',
+            data-type='text',
+            data-name='amount',
+            data-pk!='<%= id %>',
+            data-title='Сумма'
+        ) <%= amount %>
+.col-md-3
+    div
+        span.ext__editable-for-update.finstat__element-comment.format__ellipsis.format__block(
+            data-type='text',
+            data-name='comment',
+            data-pk!='<%= id %>',
+            data-title='Комментарий'
+        ) <%= comment %>
+.col-md-2.format__minor.format__nowrap
+    span.finstat__element-account(
+        data-name='fk_account_from',
+        data-value!='<%= fk_account_from %>',
+        data-title='Со счета',
+        data-pk!='<%= id %>'
+    ) <%= account_from %>
+    != '<% if (account_to) { %>'
+    span.glyphicon.glyphicon-arrow-right
+    != '<% } else if (!account_from) { %>'
+    span.finstat__show-on-hover &nbsp;/&nbsp;
+    != '<% } %>'
+    span.finstat__element-account(
+        data-name='fk_account_from',
+        data-value!='<%= fk_account_to %>',
+        data-title='На счет',
+        data-pk!='<%= id %>'
+    ) <%= account_to %>
+.col-md-1.format__right.finstat__remove-icon.finstat__show-on-hover
+    span.glyphicon.glyphicon-remove

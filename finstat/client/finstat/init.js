@@ -3,15 +3,24 @@ require(["config"], function (document) {
    // Чтобы резолвить зависимости сначала подгружаем конфиг requirejs.
    require([
       "jquery", "backbone", "moment",
+      "unit!finstat/components/header",
+      "unit!finstat/components/transactions",
       "finstat/adapters/selectable/selectize",
       "finstat/adapters/datepicker/airDatepicker",
       "finstat/adapters/editable/x-editable",
       "finstat/adapters/editable/bootbox",
-      "unit!finstat/components/header",
-      "unit!finstat/components/transactions",
       "unit!finstat/extensions/navigable",
       'moment/locale/ru'
-   ], function ($, Backbone, moment, selectable, datepicker, editableLegacy, editable, headerUnit, transactionsUnit) {
+   ], function (
+      //libraries
+      $, Backbone, moment,
+
+      //modules
+      headerUnit, transactionsUnit,
+
+      //plugins
+      selectable, datepicker, editableLegacy, editable
+   ) {
       moment.locale('ru');
 
       // Вынесено сюда для загрузки позже bootstrap.css
@@ -44,7 +53,7 @@ require(["config"], function (document) {
                title: 'Список операций ',
                baseUrl: 'transactions',
                sections: [{
-                  title: 'Все'
+                  title: 'Полный'
                }, {
                   title: 'По датам',
                   url: '/daily'

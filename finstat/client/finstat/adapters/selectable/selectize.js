@@ -6,7 +6,7 @@
 define([
    "jquery",
    "underscore",
-   "finstat/tools",
+   "finstat/misc/tools",
    'finstat/components/single/collections',
    "bootstrap",
    "selectize",

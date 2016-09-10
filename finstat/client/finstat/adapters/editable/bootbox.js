@@ -6,7 +6,7 @@
 define([
    "underscore",
    "bootbox",
-   "finstat/tools",
+   "finstat/misc/tools",
    'finstat/components/single/collections',
    "finstat/components/helpers",
    "bootstrap"

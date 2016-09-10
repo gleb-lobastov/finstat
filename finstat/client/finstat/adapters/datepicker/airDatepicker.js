@@ -5,7 +5,7 @@
  */
 define([
    "underscore",
-   "finstat/tools"
+   "finstat/misc/tools"
 ], function (_, tools) {
 
    return {
