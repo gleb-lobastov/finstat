@@ -6,11 +6,8 @@
 define([
    "underscore",
    "bootbox",
-   "finstat/misc/tools",
-   'finstat/components/single/collections',
-   "finstat/components/helpers",
    "bootstrap"
-], function (_, bootbox, tools, single, helpers) {
+], function (_, bootbox) {
 
    return {
       init: init

@@ -1,13 +1,13 @@
 define([
    'jquery',
    'underscore',
-   'finstat/components/single/collections',
+   'unit!finstat/components/annotations',
    "finstat/adapters/selectable/selectize",
    'text!finstat/extensions/x-editable/input.html',
    'text!finstat/extensions/x-editable/view.html',
    'bootstrap-editable',
    'css!finstat/extensions/x-editable/accounts'
-], function ($, _, single, selectable, inputRawTpl, viewRawTpl) {
+], function ($, _, annotations, selectable, inputRawTpl, viewRawTpl) {
    "use strict";
 
    var
@@ -37,7 +37,7 @@ define([
                selectable.init({
                   $target: this.$tpl.find(selector),
                   canCreate: true,
-                  annotations: single[options.annotations],
+                  annotations: annotations[options.annotations],
                   model: this.model,
                   attribute: options.attribute
                });

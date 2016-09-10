@@ -6,17 +6,15 @@
 define([
    "underscore",
    "finstat/misc/tools",
-   'finstat/components/single/collections',
-   "finstat/components/helpers",
 //   "finstat/extensions/x-editable/accounts",
    "css!./x-editable",
    "bootstrap",
    "bootstrap-editable"
-], function (_, tools, single, helpers) {
+], function (_, tools) {
 
    $.fn.editable.defaults.ajaxOptions = {
       beforeSend: function (xhr) {
-         xhr.setRequestHeader("X-CSRFToken", helpers.getCookie('csrftoken'))
+         xhr.setRequestHeader("X-CSRFToken", tools.helpers.getCookie('csrftoken'))
       }
    };
 

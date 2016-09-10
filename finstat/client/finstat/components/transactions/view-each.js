@@ -1,15 +1,15 @@
 define([
    'backbone',
    'moment',
-   'finstat/components/single/collections',
+   'unit!finstat/components/annotations',
    'finstat/misc/tools',
    './resources/models',
    './resources/form-add-transaction',
    'text!./resources/row-transaction.html',
    'text!./resources/interval-header.html',
    'css!./resources/row-transaction'
-], function (Backbone, moment, single, tools, models, TransactionFormView, transactionTpl, headerTpl) {
-   var detailsFetched = $.when(single.accounts.fetched, single.categories.fetched);
+], function (Backbone, moment, annotations, tools, models, TransactionFormView, transactionTpl, headerTpl) {
+   var detailsFetched = $.when(annotations.accounts.fetched, annotations.categories.fetched);
 
    var TransactionView = Backbone.View.extend({
       className: "row finstat__show-on-hover_area finstat__highlight-row",
@@ -105,11 +105,11 @@ define([
          },
          '.finstat__element-category': {
             mode: 'update',
-            annotations: single.categories
+            annotations: annotations.categories
          },
          '.finstat__element-account': {
             mode: 'update',
-            annotations: single.accounts
+            annotations: annotations.accounts
          }
       },
       url: 'api/transactions',

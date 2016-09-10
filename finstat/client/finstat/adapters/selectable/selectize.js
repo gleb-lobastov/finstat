@@ -7,12 +7,12 @@ define([
    "jquery",
    "underscore",
    "finstat/misc/tools",
-   'finstat/components/single/collections',
+   "unit!finstat/components/annotations",
    "bootstrap",
    "selectize",
    "css!selectize.bootstrap3",
    "css!./selectize"
-], function ($, _, tools, single) {
+], function ($, _, tools, annotations) {
    return {
       init: init
    };
@@ -25,7 +25,7 @@ define([
             _selectize({
                $target: view.$(selector),
                canCreate: true,
-               annotations: single[options.annotations],
+               annotations: annotations[options.annotations],
                model: view.model,
                attribute: options.attribute,
                placeholder: options.placeholder

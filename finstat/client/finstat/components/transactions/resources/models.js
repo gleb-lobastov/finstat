@@ -1,8 +1,8 @@
 define([
    'backbone',
    'moment',
-   'finstat/components/single/collections'
-], function (Backbone, moment, single) {
+   'unit!finstat/components/annotations'
+], function (Backbone, moment, annotations) {
 
    var Transaction = Backbone.Model.extend({
       schema: {
@@ -77,18 +77,18 @@ define([
          var
             values = this.toJSON();
          switch (values.transaction_type) {
-            case single.consts.TT_INCOME:
+            case annotations.consts.TT_INCOME:
                values.rowClass = 'finstat__bar-income';
                break;
-            case single.consts.TT_OUTCOME:
+            case annotations.consts.TT_OUTCOME:
                values.rowClass = 'finstat__bar-outcome';
                break;
             default:
                values.rowClass = '';
          }
-         values.account_from = single.accounts.getName(values.fk_account_from);
-         values.account_to = single.accounts.getName(values.fk_account_to);
-         values.category = single.categories.getName(values.fk_category);
+         values.account_from = annotations.accounts.getName(values.fk_account_from);
+         values.account_to = annotations.accounts.getName(values.fk_account_to);
+         values.category = annotations.categories.getName(values.fk_category);
          values.amount = values.amount || this.defaults.amount;
          values.comment = values.comment || this.defaults.comment;
          values.id = this.id;
@@ -97,10 +97,10 @@ define([
       sign: function () {
          var transactionType =
             this.get('transaction_type') ||
-            single.accounts.getOperationType(this.get('fk_account_from'), this.get('fk_account_to'));
-         if (transactionType === single.consts.TT_INCOME) {
+            annotations.accounts.getOperationType(this.get('fk_account_from'), this.get('fk_account_to'));
+         if (transactionType === annotations.consts.TT_INCOME) {
             return +1;
-         } else if (transactionType === single.consts.TT_OUTCOME) {
+         } else if (transactionType === annotations.consts.TT_OUTCOME) {
             return -1
          } else {
             return 0
@@ -135,10 +135,10 @@ define([
          }, 0);
       },
       calcIncome: function () {
-         return this.calcAmount(single.consts.TT_INCOME)
+         return this.calcAmount(annotations.consts.TT_INCOME)
       },
       calcOutcome: function () {
-         return this.calcAmount(single.consts.TT_OUTCOME)
+         return this.calcAmount(annotations.consts.TT_OUTCOME)
       }
    });
 
@@ -258,7 +258,7 @@ define([
             // Выставляем тип новой транзакции (доход/расход)
             transaction.set(
                'transaction_type',
-               single.accounts.getOperationType(
+               annotations.accounts.getOperationType(
                   transaction.get('fk_account_from'),
                   transaction.get('fk_account_to')
                ));
