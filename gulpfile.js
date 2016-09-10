@@ -45,7 +45,7 @@ gulp.task('scripts', function () {
 
 gulp.task('markup', function () {
    var
-      pug = gulp.src(config.inputPaths('pug'), {base: "./"}).pipe(job.pug()),
+      pug = gulp.src(config.inputPaths('pug'), {base: "./"}).pipe(job.pug({pretty: true})),
       html = gulp.src(config.inputPaths('html'), {base: "./"});
 
    return merge(pug, html)

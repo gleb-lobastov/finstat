@@ -1,7 +1,8 @@
 requirejs.config({
    baseUrl: '/static/vendor',
    paths: {
-      finstat: '../finstat'
+      finstat: '../finstat',
+      unit: '../finstat/extensions/require-unit-plugin'
    },
    shim: {
       'moment': {

@@ -9,7 +9,7 @@ define([
             if (href) {
                event.preventDefault();
                if (href != Backbone.history.getPath()) {
-                  Backbone.history.navigate(href);
+                  Backbone.history.navigate(href, true);
                }
             }
          });

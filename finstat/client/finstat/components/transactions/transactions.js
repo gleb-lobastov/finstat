@@ -2,15 +2,16 @@ define([
    'backbone',
    'moment',
    'finstat/components/single/collections',
-   'finstat/tools',
+   'finstat/misc/tools',
+   './resources/daily',
+   './resources/monthly',
+   './resources/annual',
    'text!./resources/transaction.html',
    'text!./resources/header.html',
    'text!./resources/form.html',
    'css!./resources/transaction',
-   'css!./resources/form',
-   'moment/locale/ru'
-], function (Backbone, moment, single, tools, transactionTpl, headerTpl, formTpl) {
-   moment.locale('ru');
+   'css!./resources/form'
+], function (Backbone, moment, single, tools, dailyView, monthlyView, annualView, transactionTpl, headerTpl, formTpl) {
    var detailsFetched = $.when(single.accounts.fetched, single.categories.fetched);
 
    // Models
@@ -559,6 +560,9 @@ define([
    });
 
    return {
-      View: TransactionsListView
+      ViewAnnual: TransactionsListView,
+      ViewMonthly: TransactionsListView,
+      ViewDaily: TransactionsListView,
+      ViewEach: TransactionsListView
    };
 });

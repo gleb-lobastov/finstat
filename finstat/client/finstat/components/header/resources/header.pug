@@ -1,0 +1,13 @@
+h1 <%=title%>
+    !="<% if (sections) { %>"
+    .btn-group.finstat__header-select-btn
+        button.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+            span#finstat__date-selector
+                !="<%= selected && selected.title || '' %>"
+            span.caret
+        ul.dropdown-menu
+            li
+                <% _.each(sections, function(section) { %>
+                a(href!="<%= baseUrl + (section.url || '') %>" data-nav) <%= section.title %>
+                <% }); %>
+    !="<% } %>"
