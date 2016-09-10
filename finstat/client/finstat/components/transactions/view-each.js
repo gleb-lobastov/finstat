@@ -6,10 +6,9 @@ define([
    './resources/models',
    './resources/form-add-transaction',
    'text!./resources/row-transaction.html',
-   'text!./resources/interval-header.html',
+   'text!./resources/row-daily.html',
    'css!./resources/row-transaction'
-], function (Backbone, moment, annotations, tools, models, TransactionFormView, transactionTpl, headerTpl) {
-   var detailsFetched = $.when(annotations.accounts.fetched, annotations.categories.fetched);
+], function (Backbone, moment, annotations, tools, models, TransactionFormView, transactionTpl, rowDailyTpl) {
 
    var TransactionView = Backbone.View.extend({
       className: "row finstat__show-on-hover_area finstat__highlight-row",
@@ -18,7 +17,6 @@ define([
          'click #finstat__form-category-filler': "fillCategory"
       },
       template: _.template(transactionTpl),
-      dateSplitterTpl: _.template(headerTpl),
       render: function () {
          this.$el.html(this.template(this.model.resolveAttributes()));
          return this;
@@ -60,7 +58,7 @@ define([
    var IntervalHeaderView = Backbone.View.extend({
       className: "row finstat__tall-row finstat__highlight-row",
       model: models.Interval,
-      template: _.template(headerTpl),
+      template: _.template(rowDailyTpl),
       initialize: function () {
          this.listenTo(this.model, 'recalculated:amount', this.updateStats);
       },
@@ -116,7 +114,7 @@ define([
       initialize: function (options) {
          this.initPlugins(options.plugins, ['editableLegacy']);
          this.listenTo(this.collection, 'reset update', function () {
-            $.when(detailsFetched).then(this.render.bind(this))
+            $.when(annotations.accounts.fetched, annotations.categories.fetched).then(this.render.bind(this))
          });
          this.collection.fetch();
       },

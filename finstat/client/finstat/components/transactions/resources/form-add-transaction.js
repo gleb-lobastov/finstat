@@ -9,7 +9,7 @@ define([
 ], function (_, Backbone, moment, tools, models, formTpl) {
 
    return Backbone.View.extend(_.extend({}, tools.PluginsMixin, {
-      className: "row finstat__show-on-hover_area finstat__highlight-row",
+      className: "row finstat__show-on-hover_area finstat__highlight-row finstat__form-light-gutter",
       events: {
          'click #finstat__form-submit': 'submit',
          'click #finstat__form-date-dec': 'dateDec',
