@@ -101,3 +101,41 @@ body
 
 .finstat__implicit-value
   color: blueviolet
+
+.finstat__agg-table td:nth-child(1)
+  text-align: right
+  padding-right: 10px
+
+nav
+  background-color: #999999
+  position: relative
+
+  ul
+    list-style-type: none
+    margin: 0
+    padding: 0
+    li
+      color: #DDD
+      padding-right: 20px
+      display: inline
+
+  &~h1
+    margin-top: 15px
+
+  &::before
+    background-color: #999999
+    content: "\00a0"
+    position: absolute
+    top: 0
+    bottom: 0
+    left: -100vw
+    right: 100%
+
+  &::after
+    background-color: #999999
+    content: "\00a0"
+    position: absolute
+    top: 0
+    bottom: 0
+    left: 100%
+    right: -100vw

@@ -1,4 +1,14 @@
-h1 <%=title%>
+nav
+   ul.format__minor
+      li
+         span.glyphicon.glyphicon-home
+      li Список операций
+      li Состсяние счетов
+      li Статистика
+      li Планирование
+h1
+   img(src="../static/finstat/resources/finstach.png")
+   <%=title%>
     !="<% if (sections) { %>"
     .btn-group.finstat__header-select-btn
         button.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")

@@ -36,7 +36,7 @@ gulp.task('styles', function () {
 
 gulp.task('scripts', function () {
    return gulp.src(config.inputPaths('js'), {base: "./"})
-      .pipe(job.print())
+//      .pipe(job.print())
       .pipe(job.formatPath())
       .pipe(job.concat('finstat.js'))
       .pipe(gulp.dest('./'))
@@ -53,6 +53,13 @@ gulp.task('markup', function () {
       .on('error', gutil.log)
       .pipe(gulp.dest('./'))
       .pipe(browserSync.reload({stream: true}));
+});
+
+gulp.task('images', function () {
+   return gulp.src(config.inputPaths('png'), {base: "./"})
+      .pipe(job.formatPath())
+      .pipe(job.imagemin({verbose: true}))
+      .pipe(gulp.dest('./'));
 });
 
 gulp.task('vendor', function () {
@@ -79,7 +86,8 @@ gulp.task('watch', function () {
    gulp.watch(config.inputPaths('sass'), ['styles']);
    gulp.watch(config.inputPaths('pug'), ['markup']);
    gulp.watch(config.inputPaths('html'), ['markup']);
+   gulp.watch(config.inputPaths('png'), ['images']);
 });
 
 gulp.task('default', ['browser-sync', 'watch']);
-gulp.task('build', ['clean', 'scripts', 'styles', 'markup', 'vendor']);
+gulp.task('build', ['clean', 'scripts', 'styles', 'markup', 'vendor', 'images']);

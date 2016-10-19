@@ -290,10 +290,55 @@ define([
       }
    });
 
+   var Aggregate = Backbone.Model.extend({
+   });
+
+   var aggregateModels = {
+      daily: Aggregate
+   };
+
+   var Aggregates = Backbone.Collection.extend({
+      model: undefined,
+      url: undefined,
+      initialize: function (options) {
+         var interval = options && options.interval;
+         this.model = aggregateModels[interval];
+         this.url = 'api/transactions/' + interval;
+      },
+      parse: function (response) {
+         var prevSplit;
+         return response.results.reduce(function (memo, resultRow) {
+            var split = resultRow.period.split('-');
+            if (prevSplit) {
+               resultRow.periodChanges = split.map(function (item, index) {
+                  return item !== prevSplit[index] ? item : false
+               }).filter(Boolean).join('-');
+            } else {
+               resultRow.periodChanges = resultRow.period;
+            }
+            prevSplit = split;
+            memo.push(resultRow);
+            return memo;
+         }, []);
+      }
+   });
+
+//   var Groups = new Backbone.Collection.extend({
+//      _groupBy: undefined,
+//      url: function () {
+//         return 'api/transactions/' + (this._groupBy || 'daily');
+//      },
+//      initialize: function (options) {
+//        this._groupBy = options && options.groupBy;
+//      }
+//   });
+
    return {
       Transaction: Transaction,
       Transactions: Transactions,
       Interval: Interval,
-      Intervals: Intervals
+      Intervals: Intervals,
+      Aggregates: Aggregates
+//      Groups: Groups
    };
 });

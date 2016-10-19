@@ -18,6 +18,11 @@ def index(request):
     return HttpResponse(template.render(context))
 
 
+def aggregated(request):
+    template = loader.get_template('finstat/transactions/aggregated.pug.jade')
+    context = RequestContext(request, {})
+    return HttpResponse(template.render(context))
+
 def stats(gen):
     iterator = iter(gen)
     value = next(gen)

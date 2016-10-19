@@ -6,7 +6,7 @@ define([
    './resources/models',
    './resources/form-add-transaction',
    'text!./resources/row-transaction.html',
-   'text!./resources/row-daily.html',
+   'text!./resources/row-transaction-header.html',
    'css!./resources/row-transaction'
 ], function (Backbone, moment, annotations, tools, models, TransactionFormView, transactionTpl, rowDailyTpl) {
 
@@ -63,7 +63,11 @@ define([
          this.listenTo(this.model, 'recalculated:amount', this.updateStats);
       },
       render: function () {
-         this.$el.html(this.template({dateStr: this.model.get('dateMoment').format('DD MMMM YYYY')}));
+         this.$el.html(this.template({
+            periodChanges: this.model.get('dateMoment').format('DD MMMM YYYY'),
+            income: 0,
+            outcome: 0
+         }));
          this.updateStats();
          return this;
       },

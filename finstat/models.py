@@ -10,9 +10,9 @@ import finstat.modules.currency as currency
 
 
 class Interval(Enum):
-    daily = 'daily'
-    monthly = 'monthly'
-    annual = 'annual'
+    day = 'daily'
+    month = 'monthly'
+    year = 'annual'
 
 
 class Performer(models.Model):
@@ -50,7 +50,7 @@ class TransactionQuerySet(models.QuerySet):
     def group_by(self, interval):
         assert isinstance(interval, Interval)
         return (
-            self.extra(select={'period': '''date_trunc('{precision}', date)'''.format(precision=interval.value)})
+            self.extra(select={'period': '''date_trunc('{precision}', date)::date'''.format(precision=interval.name)})
                 .values('period')
                 .annotate(income=Sum(Case(When(self.IS_INCOME, then='amount'), default=0)))
                 .annotate(outcome=Sum(Case(When(self.IS_OUTCOME, then='amount'), default=0)))

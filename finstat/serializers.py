@@ -15,15 +15,13 @@ class TransactionSerializer(serializers.ModelSerializer):
     transaction_type = serializers.ReadOnlyField()
 
 
-class TransactionSerializerPartial(serializers.Serializer):
-    id = serializers.IntegerField()
-    date = serializers.DateField()
-    category = serializers.CharField(allow_null=True)
-    comment = serializers.CharField()
-    fk_account_from = serializers.IntegerField()
-    fk_account_to = serializers.IntegerField()
+class TransactionGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Transaction
+        fields = ('income', 'outcome', 'period')
     income = serializers.IntegerField()
     outcome = serializers.IntegerField()
+    period = serializers.DateField()
 
 
 class AccountSerializer(serializers.ModelSerializer):
