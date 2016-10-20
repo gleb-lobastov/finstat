@@ -5,9 +5,9 @@ from django.db.models.query import QuerySet
 from django.db.models import Case, When, Q, F, Value
 from django.db.models import Count, Sum
 from django.contrib.auth.models import User
-from finstat.defaults import PAGE, PAGE_SIZE
 import finstat.modules.currency as currency
 
+PAGE, PAGE_SIZE = 1, 20
 
 class Interval(Enum):
     day = 'daily'
@@ -93,7 +93,6 @@ class TransactionManager(models.Manager):
 
     def at_page(self, page, page_size=PAGE_SIZE):
         return self.get_queryset().at_page(page, page_size)
-
 
 class Transaction(models.Model):
     objects = TransactionManager()

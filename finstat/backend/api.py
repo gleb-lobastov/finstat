@@ -1,8 +1,11 @@
 from rest_framework import status, permissions, generics
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from finstat import models, serializers
+from finstat import models
+from finstat.backend import serializers
+from finstat.backend import queries
 
 
 class AccountList(generics.ListCreateAPIView):
@@ -46,3 +49,14 @@ class TransactionGroups(generics.ListAPIView):
     def get_queryset(self):
         interval = self.kwargs['interval']
         return models.Transaction.objects.group_by(models.Interval(interval))
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny, ))
+def accounting(request):
+    ids = request.GET.getlist('id[]', None)
+    result = [
+        {'date': row.pop('date'), 'spread': row} for row in queries.accumulations(list(ids))
+    ] if ids else []
+    response = Response(result, status=status.HTTP_200_OK)
+    return response

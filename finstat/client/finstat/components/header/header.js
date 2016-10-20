@@ -55,7 +55,12 @@ define([
          this.listenTo(this.model, 'selected', this.select);
       },
       render: function () {
-         this.$el.html(this.template(this.model.toJSON())).navigable();
+         this.$el
+            .html(this.template(this.model.toJSON()))
+            .navigable()
+            .removeClass('format__disabled')
+            .find('#finstat__nav-' + this.model.get('baseUrl'))
+               .addClass('format__disabled');
          return this;
       },
       select: function () {

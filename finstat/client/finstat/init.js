@@ -5,7 +5,11 @@ require(["config"], function (document) {
 
    // Загрузка и настройка библиотек. Делается до запуска приложения что-бы его логика гарантированно учла настройки.
    require([
-      "jquery", "backbone", "moment", "moment/locale/ru", "bootstrap",
+      "jquery",
+      "backbone",
+      "moment",
+      "moment/locale/ru",
+      "bootstrap",
       "unit!finstat/extensions/navigable" // Включает роутинг Backbone для ссылок <a href=...> вместо прямого перехода
    ], function ($, Backbone, moment) {
       moment.locale('ru');
@@ -36,6 +40,7 @@ require(["config"], function (document) {
          // Компоненты
          "unit!finstat/components/header",
          "unit!finstat/components/transactions",
+         "unit!finstat/components/accounting",
 
          // Плагины
          "finstat/adapters/selectable/selectize",
@@ -46,7 +51,7 @@ require(["config"], function (document) {
          // Стили, должны загружаться позже bootstrap.css
          "css!finstat/styles/finstat.css",
          "css!finstat/styles/components.css"
-      ], function (headerUnit, transactionsUnit, selectable, datepicker, editableLegacy, editable) {
+      ], function (headerUnit, transactionsUnit, accountingUnit, selectable, datepicker, editableLegacy, editable) {
 
          var header = new headerUnit.View();
          var plugins = {
@@ -59,14 +64,19 @@ require(["config"], function (document) {
          var Workspace = Backbone.Router.extend({
             routes: {
                "(/)": "index",
-               "transactions(/:groupBy)(/:page)(/)": "transactions"
+               "transactions(/:groupBy)(/:page)(/)": "transactions",
+               "accounting(/:page)(/)": "accounting"
+//               "statistics(/:groupBy)(/:page)(/)": "statistics",
+//               "forecasting(/:groupBy)(/:page)(/)": "forecasting"
             },
 
             index: function () {
-               $('#finstat__header').html(new Header({
-                  title: 'Финстат',
-                  select: false
-               }).render());
+               header.model.update({
+                  title: 'Главная страница ',
+                  baseUrl: '',
+                  sections: false
+               });
+
                $('#finstat__content').html('<p>Выберите реестр</p>');
             },
 
@@ -94,6 +104,37 @@ require(["config"], function (document) {
                }
 
                $('#finstat__content').html(view.render().$el);
+            },
+
+            accounting: function () {
+               header.model.update({
+                  title: 'Состояние счетов ',
+                  baseUrl: 'accounting',
+                  sections: false
+               });
+
+               var view = new accountingUnit.ViewAccounting();
+               $('#finstat__content').html(view.render().$el);
+            },
+
+            statistics: function () {
+               header.model.update({
+                  title: 'Статистика ',
+                  baseUrl: 'statistics',
+                  sections: false
+               });
+
+               $('#finstat__content').html('<p>Выберите реестр</p>');
+            },
+
+            forecasting: function () {
+               header.model.update({
+                  title: 'Прогноз ',
+                  baseUrl: 'forecasting',
+                  sections: false
+               });
+
+               $('#finstat__content').html('<p>Выберите реестр</p>');
             }
 
          });

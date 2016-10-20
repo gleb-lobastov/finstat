@@ -1,15 +1,8 @@
-import datetime
-from finstat.defaults import PAGE, PAGE_SIZE
-from finstat.models import Transaction, Interval, Performer
-from finstat.forms import TransactionForm
-
 from django.template import loader, RequestContext
-from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, redirect
+from django.http import HttpResponse
+from finstat.models import Transaction, Interval
 
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
+PAGE, PAGE_SIZE = 1, 20
 
 
 def index(request):

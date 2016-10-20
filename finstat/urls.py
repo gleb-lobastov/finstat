@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
-from finstat import views, api
+from finstat import views
+from finstat.backend import api
 
 urlpatterns = patterns(
     '',
@@ -7,6 +8,7 @@ urlpatterns = patterns(
     url(r'^api/transactions$', api.TransactionList.as_view(), name='transactions_list'),
     url(r'^api/transactions/(?P<pk>[0-9]+)$', api.TransactionDetail.as_view(), name='transactions_detail'),
     url(r'^api/transactions/(?P<interval>(daily|monthly|annual))$', api.TransactionGroups.as_view(), name='transactions_group'),
+    url(r'^api/accounting$', api.accounting, name='accounting'),
     url(r'^api/accounts$', api.AccountList.as_view(), name='accounts_list'),
     url(r'^api/categories$', api.CategoryList.as_view(), name='accounts_list'),
 

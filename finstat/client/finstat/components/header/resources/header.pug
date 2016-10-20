@@ -1,14 +1,18 @@
 nav
    ul.format__minor
-      li
-         span.glyphicon.glyphicon-home
-      li Список операций
-      li Состсяние счетов
-      li Статистика
-      li Планирование
-h1
-   img(src="../static/finstat/resources/finstach.png")
-   <%=title%>
+      li#finstat__nav-home
+         a(href!="/" data-nav)
+            span.glyphicon.glyphicon-home
+            span#finstat__logo инстат
+      li#finstat__nav-transactions
+         a(href!="/transactions" data-nav) Список операций
+      li#finstat__nav-accounting
+         a(href!="/accounting" data-nav) Состояние счетов
+//      li#finstat__nav-statistics
+//         a(href!="/statistics" data-nav) Статистика
+//      li#finstat__nav-forecasting
+//         a(href!="/forecasting" data-nav) Планирование
+h1 <%=title%>
     !="<% if (sections) { %>"
     .btn-group.finstat__header-select-btn
         button.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")

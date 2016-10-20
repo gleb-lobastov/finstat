@@ -1,0 +1,8 @@
+tr
+   td
+      span.finstat__interval-date <%= date %>
+   <% _.each(spread, function(amount, accountName) { %>
+   td
+      span <%= accountName %>:
+      span <%= amount %>
+   <% }) %>
