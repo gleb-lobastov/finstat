@@ -1,0 +1,9 @@
+table.table.table-hover#finstat__accounting-table
+   thead
+      tr
+         th Дата
+         <% _.each(names, function(name) { %>
+         th
+            span <%= name %>:
+         <% }) %>
+   tbody

@@ -32,7 +32,7 @@ require(["config"], function (document) {
           *  Call the stored original Backbone.sync
           * method with the new url property
           */
-         backboneSync(method, model, options);
+         return backboneSync(method, model, options);
       };
 
       // Запуск приложения

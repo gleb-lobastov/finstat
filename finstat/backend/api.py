@@ -55,8 +55,5 @@ class TransactionGroups(generics.ListAPIView):
 @permission_classes((permissions.AllowAny, ))
 def accounting(request):
     ids = request.GET.getlist('id[]', None)
-    result = [
-        {'date': row.pop('date'), 'spread': row} for row in queries.accumulations(list(ids))
-    ] if ids else []
-    response = Response(result, status=status.HTTP_200_OK)
+    response = Response(queries.accumulations(ids), status=status.HTTP_200_OK)
     return response

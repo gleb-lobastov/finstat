@@ -1,13 +1,7 @@
-define(['backbone'], function (Backbone) {
-   // singleton
-   var consts = {
-      TT_INCOME: 1,
-      TT_OUTCOME: 2,
-      TT_MOVE_OWN: 3,
-      TT_MOVE_OTHER: 4,
-      TT_UNDEFINED: 5
-   };
-   
+define([
+   "backbone",
+   "finstat/core"
+], function (Backbone, core) {
    var AnnotationsCollection = Backbone.Collection.extend({
       keyField: 'id',
       fetched: false,
@@ -44,9 +38,9 @@ define(['backbone'], function (Backbone) {
             isToOwn = modelTo && modelTo.get('account_type') === 'OW';
 
          if (isFromOwn) {
-            return isToOwn ? consts.TT_MOVE_OWN : consts.TT_OUTCOME;
+            return isToOwn ? core.enums.TransactionType.moveOwn : core.enums.TransactionType.outcome;
          } else {
-            return isToOwn ? consts.TT_INCOME : consts.TT_MOVE_OTHER;
+            return isToOwn ? core.enums.TransactionType.moveOther : core.enums.TransactionType.income;
          }
       }
    });
@@ -63,7 +57,6 @@ define(['backbone'], function (Backbone) {
 
    return {
       accounts: new AccountsCollection(),
-      categories: new CategoriesCollection(),
-      consts: consts
+      categories: new CategoriesCollection()
    }
 });

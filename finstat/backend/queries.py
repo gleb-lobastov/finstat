@@ -22,7 +22,7 @@ def accumulations(account_ids):
     account_ids = list(map(int, account_ids))
 
     amount_accumulation = """
-        SUM (A{id}) OVER (ORDER BY date) A{id}
+        SUM (A{id}) OVER (ORDER BY date) "{id}"
     """
     spread_amount_by_accounts = """
         SUM(
@@ -48,4 +48,6 @@ def accumulations(account_ids):
     accumulations = ', '.join(amount_accumulation.format(id=account_id) for account_id in account_ids)
     spread = ', '.join(spread_amount_by_accounts.format(id=account_id) for account_id in account_ids)
 
-    return _run_query(query.format(accumulations=accumulations, amounts=spread, ids=accounts))
+    cursor = connection.cursor()
+    cursor.execute(query.format(accumulations=accumulations, amounts=spread, ids=accounts))
+    return [{'date': row[0], 'spread': row[1:]} for row in cursor.fetchall()]

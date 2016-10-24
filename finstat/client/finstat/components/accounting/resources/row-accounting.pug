@@ -1,8 +1,7 @@
 tr
-   td
+   th(scope="row")
       span.finstat__interval-date <%= date %>
-   <% _.each(spread, function(amount, accountName) { %>
+   <% _.each(spread, function(amount) { %>
    td
-      span <%= accountName %>:
       span <%= amount %>
    <% }) %>

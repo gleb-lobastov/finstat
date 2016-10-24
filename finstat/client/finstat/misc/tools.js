@@ -1,6 +1,9 @@
 define([
-   "jquery"
-], function ($) {
+   "jquery",
+   "moment",
+   "finstat/core"
+], function ($, moment, core) {
+   "use strict";
 
    function Waiting() {
       this._storage = {}
@@ -58,7 +61,8 @@ define([
       FutureApi: FutureApi,
       PluginsMixin: PluginsMixin,
       helpers: {
-         getCookie: getCookie
+         getCookie: getCookie,
+         addPeriodChangesRow: addPeriodChangesRow
       }
    };
 
@@ -67,4 +71,47 @@ define([
       var parts = value.split("; " + name + "=");
       if (parts.length == 2) return parts.pop().split(";").shift();
    }
+
+   function addPeriodChangesRow(arrayOfObjects, originalField, fieldToSave, precision) {
+      if (!core.enums.Interval.hasOwnProperty(precision)) {
+         throw new Error('Unsupported type of interval')
+      }
+
+      var
+         current,
+         previous,
+         track,
+         formats = {
+            upToDay: 'LL',
+            upToMonth: 'MMMM YYYY',
+            upToYear: 'YYYY'
+         };
+
+      for (var index=0; index < arrayOfObjects.length; index++) {
+         current = new moment(arrayOfObjects[index][originalField]);
+         if (previous) {
+            if (precision === core.enums.Interval.daily && current.date() !== previous.date()) {
+               track = 'upToDay';
+            } else if (precision !== core.enums.Interval.annual && current.month() !== previous.month()) {
+               track = 'upToMonth';
+            } else if (current.year() !== previous.year()) {
+               track = 'upToYear';
+            }
+
+         // Logic for first item of arrayOfObjects
+         } else if (precision === core.enums.Interval.daily) {
+            track = 'upToDay';
+         } else if (precision === core.enums.Interval.monthly) {
+            track = 'upToMonth';
+         } else {
+            track = 'upToYear';
+         }
+
+         arrayOfObjects[index][fieldToSave] = track ? current.format(formats[track]) : '';
+         previous = current;
+      }
+
+      return arrayOfObjects;
+   }
+
 });

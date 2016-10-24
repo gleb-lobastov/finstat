@@ -1,8 +1,10 @@
 define([
    'backbone',
    'moment',
-   'unit!finstat/components/annotations'
-], function (Backbone, moment, annotations) {
+   'finstat/core',
+   'unit!finstat/components/annotations',
+   'finstat/misc/tools'
+], function (Backbone, moment, core, annotations, tools) {
 
    var Transaction = Backbone.Model.extend({
       schema: {
@@ -77,10 +79,10 @@ define([
          var
             values = this.toJSON();
          switch (values.transaction_type) {
-            case annotations.consts.TT_INCOME:
+            case core.enums.TransactionType.income:
                values.rowClass = 'finstat__bar-income';
                break;
-            case annotations.consts.TT_OUTCOME:
+            case core.enums.TransactionType.outcome:
                values.rowClass = 'finstat__bar-outcome';
                break;
             default:
@@ -98,9 +100,9 @@ define([
          var transactionType =
             this.get('transaction_type') ||
             annotations.accounts.getOperationType(this.get('fk_account_from'), this.get('fk_account_to'));
-         if (transactionType === annotations.consts.TT_INCOME) {
+         if (transactionType === core.enums.TransactionType.income) {
             return +1;
-         } else if (transactionType === annotations.consts.TT_OUTCOME) {
+         } else if (transactionType === core.enums.TransactionType.outcome) {
             return -1
          } else {
             return 0
@@ -135,10 +137,10 @@ define([
          }, 0);
       },
       calcIncome: function () {
-         return this.calcAmount(annotations.consts.TT_INCOME)
+         return this.calcAmount(core.enums.TransactionType.income)
       },
       calcOutcome: function () {
-         return this.calcAmount(annotations.consts.TT_OUTCOME)
+         return this.calcAmount(core.enums.TransactionType.outcome)
       }
    });
 
@@ -293,33 +295,16 @@ define([
    var Aggregate = Backbone.Model.extend({
    });
 
-   var aggregateModels = {
-      daily: Aggregate
-   };
-
    var Aggregates = Backbone.Collection.extend({
-      model: undefined,
+      model: Aggregate,
       url: undefined,
-      initialize: function (options) {
-         var interval = options && options.interval;
-         this.model = aggregateModels[interval];
-         this.url = 'api/transactions/' + interval;
+      interval: undefined,
+      initialize: function (models, options) {
+         this.interval = options && options.interval;
+         this.url = 'api/transactions/' + this.interval;
       },
       parse: function (response) {
-         var prevSplit;
-         return response.results.reduce(function (memo, resultRow) {
-            var split = resultRow.period.split('-');
-            if (prevSplit) {
-               resultRow.periodChanges = split.map(function (item, index) {
-                  return item !== prevSplit[index] ? item : false
-               }).filter(Boolean).join('-');
-            } else {
-               resultRow.periodChanges = resultRow.period;
-            }
-            prevSplit = split;
-            memo.push(resultRow);
-            return memo;
-         }, []);
+         return tools.helpers.addPeriodChangesRow(response.results, 'period', 'periodChanges', this.interval);
       }
    });
 
